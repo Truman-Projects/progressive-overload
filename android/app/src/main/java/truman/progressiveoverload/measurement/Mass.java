@@ -52,4 +52,15 @@ public class Mass {
         return new Mass(subtractedMilligrams);
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof Mass)) {
+            return false;
+        }
+        return (this.milligrams_ == ((Mass) other).toMilligrams());
+    }
+
 }

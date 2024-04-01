@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Stream;
 
 import truman.progressiveoverload.measurement.Mass;
 
@@ -94,7 +95,6 @@ public class TestMass {
         long randomMilligrams1 = ThreadLocalRandom.current().nextLong(halfMaxLong);
         long randomMilligrams2 = ThreadLocalRandom.current().nextLong(halfMaxLong);
         long milligrams1Plus2 = randomMilligrams1 + randomMilligrams2;
-
         Mass mass1 = new Mass(randomMilligrams1);
         Mass mass2 = new Mass(randomMilligrams2);
         Mass mass1PlusMass2 = mass1.plus(mass2);
@@ -116,4 +116,25 @@ public class TestMass {
         assertEquals(milligrams1Minus2, mass1MinusMass2.toMilligrams());
 
     }
+
+    @ParameterizedTest
+    @MethodSource("testEqualityOperator_data")
+    public void testEqualityOperator(long milligrams1, long milligrams2, boolean massesExpectedToBeEqual) {
+        Mass mass1 = new Mass(milligrams1);
+        Mass mass2 = new Mass(milligrams2);
+
+        assertEquals((mass1.equals(mass2)), massesExpectedToBeEqual);
+    }
+
+    private static Stream<Arguments> testEqualityOperator_data() {
+        long randomMilligrams1 = ThreadLocalRandom.current().nextLong();
+        long randomMilligrams2 = ThreadLocalRandom.current().nextLong(); // ThreadLocalRandom guarantees different value
+        boolean massesNotEqual = false;
+        boolean massesEqual = true;
+        return Stream.of(
+                Arguments.of(randomMilligrams1, randomMilligrams2, massesNotEqual),
+                Arguments.of(randomMilligrams1, randomMilligrams1, massesEqual)
+        );
+    }
+
 }
