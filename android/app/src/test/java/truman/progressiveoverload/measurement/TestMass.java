@@ -123,7 +123,7 @@ public class TestMass {
         Mass mass1 = new Mass(milligrams1);
         Mass mass2 = new Mass(milligrams2);
 
-        assertEquals((mass1.equals(mass2)), massesExpectedToBeEqual);
+        assertEquals(massesExpectedToBeEqual, (mass1.equals(mass2)));
     }
 
     private static Stream<Arguments> testEqualityOperator_data() {
