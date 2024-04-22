@@ -7,26 +7,24 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 import truman.progressiveoverload.measurement.Mass;
+import truman.progressiveoverload.measurement.RandomMass;
 import truman.progressiveoverload.randomUtilities.RandomLocalDateTime;
-import truman.progressiveoverload.randomUtilities.RandomLong;
 
 class TestTimestampedMass {
     @Test
     public void willProvideValueInDefaultUnitsOfMilligrams() {
-        long randomMilligrams = new RandomLong().generate();
+        Mass mass = new RandomMass().generate();
         LocalDateTime arbitraryTimestamp = new RandomLocalDateTime().generate();
-        Mass mass = new Mass(randomMilligrams);
 
         TimestampedMass timestampedMass = new TimestampedMass(mass, arbitraryTimestamp);
 
-        assertEquals(randomMilligrams, timestampedMass.valueInDefaultUnits());
+        assertEquals(mass.toMilligrams(), timestampedMass.valueInDefaultUnits());
     }
 
     @Test
     public void willReturnCorrectTimestamp() {
-        long arbitraryMilligrams = new RandomLong().generate();
+        Mass mass = new RandomMass().generate();
         LocalDateTime randomTimestamp = new RandomLocalDateTime().generate();
-        Mass mass = new Mass(arbitraryMilligrams);
 
         TimestampedMass timestampedMass = new TimestampedMass(mass, randomTimestamp);
 
@@ -35,9 +33,8 @@ class TestTimestampedMass {
 
     @Test
     public void willReturnCorrectMassObject() {
-        long randomMilligrams = new RandomLong().generate();
         LocalDateTime randomTimestamp = new RandomLocalDateTime().generate();
-        Mass expectedMass = new Mass(randomMilligrams);
+        Mass expectedMass = new RandomMass().generate();
 
         TimestampedMass timestampedMass = new TimestampedMass(expectedMass, randomTimestamp);
 
