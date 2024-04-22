@@ -2,7 +2,7 @@ package truman.progressiveoverload.randomUtilities;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class RandomLong implements I_RandomNumericGenerator<Long> {
+public class RandomLong implements I_RandomValueGenerator<Long> {
     public Long generate(Long minValue, Long maxValue) {
         return ThreadLocalRandom.current().nextLong(minValue, maxValue);
     }
