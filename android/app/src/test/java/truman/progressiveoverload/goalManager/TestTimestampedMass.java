@@ -5,16 +5,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.ThreadLocalRandom;
 
 import truman.progressiveoverload.measurement.Mass;
-import truman.progressiveoverload.testUtils.RandomLocalDateTime;
+import truman.progressiveoverload.randomUtilities.RandomLocalDateTime;
+import truman.progressiveoverload.randomUtilities.RandomLong;
 
 class TestTimestampedMass {
     @Test
     public void willProvideValueInDefaultUnitsOfMilligrams() {
-        long randomMilligrams = ThreadLocalRandom.current().nextLong();
-        LocalDateTime arbitraryTimestamp = RandomLocalDateTime.generate();
+        long randomMilligrams = new RandomLong().generate();
+        LocalDateTime arbitraryTimestamp = new RandomLocalDateTime().generate();
         Mass mass = new Mass(randomMilligrams);
 
         TimestampedMass timestampedMass = new TimestampedMass(mass, arbitraryTimestamp);
@@ -24,8 +24,8 @@ class TestTimestampedMass {
 
     @Test
     public void willReturnCorrectTimestamp() {
-        long arbitraryMilligrams = ThreadLocalRandom.current().nextLong();
-        LocalDateTime randomTimestamp = RandomLocalDateTime.generate();
+        long arbitraryMilligrams = new RandomLong().generate();
+        LocalDateTime randomTimestamp = new RandomLocalDateTime().generate();
         Mass mass = new Mass(arbitraryMilligrams);
 
         TimestampedMass timestampedMass = new TimestampedMass(mass, randomTimestamp);
@@ -35,8 +35,8 @@ class TestTimestampedMass {
 
     @Test
     public void willReturnCorrectMassObject() {
-        long randomMilligrams = ThreadLocalRandom.current().nextLong();
-        LocalDateTime randomTimestamp = RandomLocalDateTime.generate();
+        long randomMilligrams = new RandomLong().generate();
+        LocalDateTime randomTimestamp = new RandomLocalDateTime().generate();
         Mass expectedMass = new Mass(randomMilligrams);
 
         TimestampedMass timestampedMass = new TimestampedMass(expectedMass, randomTimestamp);
