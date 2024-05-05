@@ -1,4 +1,4 @@
-package truman.progressiveoverload.goalManagement;
+package truman.progressiveoverload.measurement;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-import truman.progressiveoverload.measurement.Mass;
-import truman.progressiveoverload.measurement.RandomMass;
 import truman.progressiveoverload.randomUtilities.RandomLocalDateTime;
 
 class TestTimestampedMass {

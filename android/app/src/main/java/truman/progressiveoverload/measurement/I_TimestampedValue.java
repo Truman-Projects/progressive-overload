@@ -1,8 +1,8 @@
-package truman.progressiveoverload.goalManagement;
+package truman.progressiveoverload.measurement;
 
 import java.time.LocalDateTime;
 
-interface I_TimestampedValue {
+public interface I_TimestampedValue {
     long valueInDefaultUnits();
 
     LocalDateTime timestamp();
