@@ -1,4 +1,4 @@
-package truman.progressiveoverload.goalManager;
+package truman.progressiveoverload.goalManagement;
 
 import static org.junit.jupiter.api.Assertions.*;
 

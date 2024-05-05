@@ -1,4 +1,4 @@
-package truman.progressiveoverload.goalManager;
+package truman.progressiveoverload.goalManagement;
 
 import java.time.LocalDateTime;
 
