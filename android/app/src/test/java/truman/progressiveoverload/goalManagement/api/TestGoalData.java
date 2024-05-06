@@ -187,10 +187,11 @@ class TestGoalData {
     // returns (GoalData<FakeTimestampedValue goalData1, GoalData<FakeTimestampedValue goalData2, boolean expectedEquals)
     private static Stream<Arguments> testEqualityOperator_data() {
         RandomString stringGen = new RandomString();
+        RandomOther<String> uniqueStringGen = new RandomOther<>(stringGen);
         String name1 = stringGen.generate();
-        String name2 = stringGen.generate();
+        String name2 = uniqueStringGen.otherThan(name1);
         String description1 = stringGen.generate();
-        String description2 = stringGen.generate();
+        String description2 = uniqueStringGen.otherThan(description1);
         GoalType goalType1 = GoalType.MINIMIZE;
         GoalType goalType2 = GoalType.MAXIMIZE;
         HashMap<Long, FakeTimestampedValue> records1 = timestampedValueHashMapGenerator_.generate();

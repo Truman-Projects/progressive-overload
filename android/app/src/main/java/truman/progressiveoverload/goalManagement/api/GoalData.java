@@ -13,9 +13,8 @@ public final class GoalData<TimestampedType extends I_TimestampedValue> {
     private final HashMap<Long, TimestampedType> recordsById_;
     private final HashMap<Long, TimestampedType> targetMilestonesById_;
 
-    public GoalData(String name, String description, GoalType goalType,
-                    HashMap<Long, TimestampedType> records,
-                    HashMap<Long, TimestampedType> targetMilestones) {
+    public GoalData(String name, String description, GoalType goalType, HashMap<Long, TimestampedType> records, HashMap<Long,
+            TimestampedType> targetMilestones) {
         name_ = name;
         description_ = description;
         goalType_ = goalType;
@@ -23,8 +22,7 @@ public final class GoalData<TimestampedType extends I_TimestampedValue> {
         targetMilestonesById_ = new HashMap<>(targetMilestones);
     }
 
-    public GoalData(String name, String description, GoalType goalType,
-                    HashMap<Long, TimestampedType> records) {
+    public GoalData(String name, String description, GoalType goalType, HashMap<Long, TimestampedType> records) {
         this(name, description, goalType, records, new HashMap<>());
     }
 
