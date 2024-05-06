@@ -12,7 +12,7 @@ public class RandomArrayList<Type> implements I_RandomValueGenerator<ArrayList<T
     }
 
     public ArrayList<Type> generate(int size) {
-        ArrayList<Type> list = new ArrayList<Type>();
+        ArrayList<Type> list = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
             Type element = generator_.generate();

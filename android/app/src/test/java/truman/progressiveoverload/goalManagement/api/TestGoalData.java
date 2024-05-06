@@ -185,23 +185,23 @@ class TestGoalData {
 
         return Stream.of(
                 // equals
-                Arguments.of(new GoalData<FakeTimestampedValue>(name1, description1, goalType1, records1, targetMilestones1),
-                        new GoalData<FakeTimestampedValue>(name1, description1, goalType1, records1, targetMilestones1), true),
+                Arguments.of(new GoalData<>(name1, description1, goalType1, records1, targetMilestones1),
+                        new GoalData<>(name1, description1, goalType1, records1, targetMilestones1), true),
                 // different names
-                Arguments.of(new GoalData<FakeTimestampedValue>(name1, description1, goalType1, records1, targetMilestones1),
-                        new GoalData<FakeTimestampedValue>(name2, description1, goalType1, records1, targetMilestones1), false),
+                Arguments.of(new GoalData<>(name1, description1, goalType1, records1, targetMilestones1),
+                        new GoalData<>(name2, description1, goalType1, records1, targetMilestones1), false),
                 // different descriptions
-                Arguments.of(new GoalData<FakeTimestampedValue>(name1, description1, goalType1, records1, targetMilestones1),
-                        new GoalData<FakeTimestampedValue>(name1, description2, goalType1, records1, targetMilestones1), false),
+                Arguments.of(new GoalData<>(name1, description1, goalType1, records1, targetMilestones1),
+                        new GoalData<>(name1, description2, goalType1, records1, targetMilestones1), false),
                 // different goalTypes
-                Arguments.of(new GoalData<FakeTimestampedValue>(name1, description1, goalType1, records1, targetMilestones1),
-                        new GoalData<FakeTimestampedValue>(name1, description1, goalType2, records1, targetMilestones1), false),
+                Arguments.of(new GoalData<>(name1, description1, goalType1, records1, targetMilestones1),
+                        new GoalData<>(name1, description1, goalType2, records1, targetMilestones1), false),
                 // different records
-                Arguments.of(new GoalData<FakeTimestampedValue>(name1, description1, goalType1, records1, targetMilestones1),
-                        new GoalData<FakeTimestampedValue>(name1, description1, goalType1, records2, targetMilestones1), false),
+                Arguments.of(new GoalData<>(name1, description1, goalType1, records1, targetMilestones1),
+                        new GoalData<>(name1, description1, goalType1, records2, targetMilestones1), false),
                 // different targetMilestones
-                Arguments.of(new GoalData<FakeTimestampedValue>(name1, description1, goalType1, records1, targetMilestones1),
-                        new GoalData<FakeTimestampedValue>(name1, description1, goalType1, records1, targetMilestones2), false)
+                Arguments.of(new GoalData<>(name1, description1, goalType1, records1, targetMilestones1),
+                        new GoalData<>(name1, description1, goalType1, records1, targetMilestones2), false)
         );
 
 
