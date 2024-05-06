@@ -8,25 +8,30 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.stream.Stream;
 
 import truman.progressiveoverload.measurement.FakeTimestampedValue;
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 import truman.progressiveoverload.measurement.RandomFakeTimestampedValue;
 import truman.progressiveoverload.measurement.TimestampedMass;
-import truman.progressiveoverload.randomUtilities.RandomArrayList;
 import truman.progressiveoverload.randomUtilities.RandomEnum;
+import truman.progressiveoverload.randomUtilities.RandomHashMap;
+import truman.progressiveoverload.randomUtilities.RandomLong;
+import truman.progressiveoverload.randomUtilities.RandomOther;
 import truman.progressiveoverload.randomUtilities.RandomString;
 
 class TestGoalData {
-    private static final RandomArrayList<FakeTimestampedValue> timestampedValueListGenerator_ =
-            new RandomArrayList<>(new RandomFakeTimestampedValue());
+    private static final RandomFakeTimestampedValue fakeTimestampedValueGenerator_ = new RandomFakeTimestampedValue();
+    private static final RandomHashMap<Long, FakeTimestampedValue> timestampedValueHashMapGenerator_ =
+            new RandomHashMap<>(new RandomLong(), fakeTimestampedValueGenerator_);
+
 
     @ParameterizedTest
     @MethodSource("basicGoalDataFields")
     public void validateBasicConstructor(String randomName, String randomDescription, GoalType randomGoalType) {
-        ArrayList<FakeTimestampedValue> randomRecords = timestampedValueListGenerator_.generate();
-        ArrayList<FakeTimestampedValue> randomTargetMilestones = timestampedValueListGenerator_.generate();
+        HashMap<Long, FakeTimestampedValue> randomRecords = timestampedValueHashMapGenerator_.generate();
+        HashMap<Long, FakeTimestampedValue> randomTargetMilestones = timestampedValueHashMapGenerator_.generate();
 
         GoalData<FakeTimestampedValue> patient = new GoalData<>(randomName, randomDescription, randomGoalType, randomRecords,
                 randomTargetMilestones);
@@ -36,27 +41,31 @@ class TestGoalData {
 
     @Test
     public void basicConstructorStoresInputsByCopy() {
-        ArrayList<FakeTimestampedValue> randomRecords = timestampedValueListGenerator_.generate();
-        ArrayList<FakeTimestampedValue> randomTargetMilestones = timestampedValueListGenerator_.generate();
-        ArrayList<FakeTimestampedValue> originalRecords = new ArrayList<>(randomRecords);
-        ArrayList<FakeTimestampedValue> originalTargetMilestones = new ArrayList<>(randomTargetMilestones);
-        FakeTimestampedValue randomTimestampedValue1 = new RandomFakeTimestampedValue().generate();
-        FakeTimestampedValue randomTimestampedValue2 = new RandomFakeTimestampedValue().generate();
+        RandomOther<Long> uniqueKeyGenerator = new RandomOther<>(new RandomLong());
+        HashMap<Long, FakeTimestampedValue> randomRecords = timestampedValueHashMapGenerator_.generate();
+        HashMap<Long, FakeTimestampedValue> randomTargetMilestones = timestampedValueHashMapGenerator_.generate();
+        HashMap<Long, FakeTimestampedValue> originalRecords = new HashMap<>(randomRecords);
+        HashMap<Long, FakeTimestampedValue> originalTargetMilestones = new HashMap<>(randomTargetMilestones);
+        // arbitrary keys and values to attempt to alter patient's records and targetMilestones by reference
+        FakeTimestampedValue randomTimestampedValue1 = fakeTimestampedValueGenerator_.generate();
+        Long randomKey1 = uniqueKeyGenerator.otherThan(new ArrayList<>(randomRecords.keySet()));
+        FakeTimestampedValue randomTimestampedValue2 = fakeTimestampedValueGenerator_.generate();
+        Long randomKey2 = uniqueKeyGenerator.otherThan(new ArrayList<>(randomTargetMilestones.keySet()));
 
         GoalData<FakeTimestampedValue> patient = new GoalData<>(new RandomString().generate(), new RandomString().generate(),
                 new RandomEnum<>(GoalType.class).generate(), randomRecords, randomTargetMilestones);
-        randomRecords.add(randomTimestampedValue1);
-        randomTargetMilestones.add(randomTimestampedValue2);
+        randomRecords.put(randomKey1, randomTimestampedValue1);
+        randomTargetMilestones.put(randomKey2, randomTimestampedValue2);
 
-        assertEquals(originalRecords, patient.records());
-        assertEquals(originalTargetMilestones, patient.targetMilestones());
+        assertEquals(originalRecords, patient.recordsById());
+        assertEquals(originalTargetMilestones, patient.targetMilestonesById());
     }
 
     @ParameterizedTest
     @MethodSource("basicGoalDataFields")
     public void validateConstructorOverloadWithoutTargetMilestones(String randomName, String randomDescription, GoalType randomGoalType) {
-        ArrayList<FakeTimestampedValue> randomRecords = timestampedValueListGenerator_.generate();
-        ArrayList<FakeTimestampedValue> emptyTargetMilestones = new ArrayList<>();
+        HashMap<Long, FakeTimestampedValue> randomRecords = timestampedValueHashMapGenerator_.generate();
+        HashMap<Long, FakeTimestampedValue> emptyTargetMilestones = new HashMap<>();
 
         GoalData<FakeTimestampedValue> patient = new GoalData<>(randomName, randomDescription, randomGoalType, randomRecords);
 
@@ -67,8 +76,8 @@ class TestGoalData {
     @MethodSource("basicGoalDataFields")
     public void validateConstructorOverloadWithoutTargetMilestonesOrRecords(String randomName, String randomDescription,
                                                                             GoalType randomGoalType) {
-        ArrayList<FakeTimestampedValue> emptyRecords = new ArrayList<>();
-        ArrayList<FakeTimestampedValue> emptyTargetMilestones = new ArrayList<>();
+        HashMap<Long, FakeTimestampedValue> emptyRecords = new HashMap<>();
+        HashMap<Long, FakeTimestampedValue> emptyTargetMilestones = new HashMap<>();
 
         GoalData<FakeTimestampedValue> patient = new GoalData<>(randomName, randomDescription, randomGoalType);
 
@@ -83,8 +92,8 @@ class TestGoalData {
         GoalData<FakeTimestampedValue> goalDataWithNewDescription = originalGoalData.withDescription(newDescription);
 
         assertNotSame(originalGoalData, goalDataWithNewDescription);
-        validateAllGoalFields(originalGoalData.name(), newDescription, originalGoalData.goalType(), originalGoalData.records(),
-                originalGoalData.targetMilestones(),
+        validateAllGoalFields(originalGoalData.name(), newDescription, originalGoalData.goalType(), originalGoalData.recordsById(),
+                originalGoalData.targetMilestonesById(),
                 goalDataWithNewDescription);
     }
 
@@ -96,8 +105,8 @@ class TestGoalData {
         GoalData<FakeTimestampedValue> goalDataWithNewGoalType = originalGoalData.withGoalType(newGoalType);
 
         assertNotSame(originalGoalData, goalDataWithNewGoalType);
-        validateAllGoalFields(originalGoalData.name(), originalGoalData.description(), newGoalType, originalGoalData.records(),
-                originalGoalData.targetMilestones(),
+        validateAllGoalFields(originalGoalData.name(), originalGoalData.description(), newGoalType, originalGoalData.recordsById(),
+                originalGoalData.targetMilestonesById(),
                 goalDataWithNewGoalType);
     }
 
@@ -112,54 +121,60 @@ class TestGoalData {
     }
 
     @Test
-    public void withRecordsWillReturnCopyWithNewRecords() {
+    public void withRecordsByIdWillReturnCopyWithNewRecords() {
         GoalData<FakeTimestampedValue> originalGoalData = new RandomGoalData().generate();
-        ArrayList<FakeTimestampedValue> newRecords = timestampedValueListGenerator_.generate();
+        HashMap<Long, FakeTimestampedValue> newRecords = timestampedValueHashMapGenerator_.generate();
 
-        GoalData<FakeTimestampedValue> goalDataWithNewRecords = originalGoalData.withRecords(newRecords);
+        GoalData<FakeTimestampedValue> goalDataWithNewRecords = originalGoalData.withRecordsById(newRecords);
 
         assertNotSame(originalGoalData, goalDataWithNewRecords);
         validateAllGoalFields(originalGoalData.name(), originalGoalData.description(), originalGoalData.goalType(), newRecords,
-                originalGoalData.targetMilestones(),
+                originalGoalData.targetMilestonesById(),
                 goalDataWithNewRecords);
     }
 
     @Test
-    public void withRecordsWillReturnCopyWithNewTargetMilestones() {
+    public void withTargetMilestonesByIdWillReturnCopyWithNewTargetMilestones() {
         GoalData<FakeTimestampedValue> originalGoalData = new RandomGoalData().generate();
-        ArrayList<FakeTimestampedValue> newTargetMilestones = timestampedValueListGenerator_.generate();
+        HashMap<Long, FakeTimestampedValue> newTargetMilestones = timestampedValueHashMapGenerator_.generate();
 
-        GoalData<FakeTimestampedValue> goalDataWithNewTargetMilestones = originalGoalData.withTargetMilestones(newTargetMilestones);
+        GoalData<FakeTimestampedValue> goalDataWithNewTargetMilestones = originalGoalData.withTargetMilestonesById(newTargetMilestones);
 
         assertNotSame(originalGoalData, goalDataWithNewTargetMilestones);
         validateAllGoalFields(originalGoalData.name(), originalGoalData.description(), originalGoalData.goalType(),
-                originalGoalData.records(),
+                originalGoalData.recordsById(),
                 newTargetMilestones,
                 goalDataWithNewTargetMilestones);
     }
 
     @Test
     public void willReturnRecordsByCopy() {
+        RandomOther<Long> uniqueKeyGenerator = new RandomOther<>(new RandomLong());
         GoalData<FakeTimestampedValue> patient = new RandomGoalData().generate();
-        ArrayList<FakeTimestampedValue> originalRecords = new ArrayList<>(patient.records());
-        FakeTimestampedValue randomTimestampedValue = new RandomFakeTimestampedValue().generate();
+        HashMap<Long, FakeTimestampedValue> originalRecords = new HashMap<>(patient.recordsById());
+        // random key value pair to attempt to alter records received from getter
+        Long randomKey = uniqueKeyGenerator.otherThan(new ArrayList<>(patient.recordsById().keySet()));
+        FakeTimestampedValue randomTimestampedValue = fakeTimestampedValueGenerator_.generate();
 
-        ArrayList<FakeTimestampedValue> recordsFromPatient = patient.records();
-        recordsFromPatient.add(randomTimestampedValue);
+        HashMap<Long, FakeTimestampedValue> recordsFromPatient = patient.recordsById();
+        recordsFromPatient.put(randomKey, randomTimestampedValue);
 
-        assertEquals(originalRecords, patient.records());
+        assertEquals(originalRecords, patient.recordsById());
     }
 
     @Test
     public void willReturnTargetMilestonesByCopy() {
+        RandomOther<Long> uniqueKeyGenerator = new RandomOther<>(new RandomLong());
         GoalData<FakeTimestampedValue> patient = new RandomGoalData().generate();
-        ArrayList<FakeTimestampedValue> originalTargetMilestones = new ArrayList<>(patient.targetMilestones());
-        FakeTimestampedValue randomTimestampedValue = new RandomFakeTimestampedValue().generate();
+        HashMap<Long, FakeTimestampedValue> originalTargetMilestones = new HashMap<>(patient.targetMilestonesById());
+        // random key value pair to attempt to alter targetMilestones received from getter
+        Long randomKey = uniqueKeyGenerator.otherThan(new ArrayList<>(patient.recordsById().keySet()));
+        FakeTimestampedValue randomTimestampedValue = fakeTimestampedValueGenerator_.generate();
 
-        ArrayList<FakeTimestampedValue> targetMilestonesFromPatient = patient.targetMilestones();
-        targetMilestonesFromPatient.add(randomTimestampedValue);
+        HashMap<Long, FakeTimestampedValue> targetMilestonesFromPatient = patient.targetMilestonesById();
+        targetMilestonesFromPatient.put(randomKey, randomTimestampedValue);
 
-        assertEquals(originalTargetMilestones, patient.targetMilestones());
+        assertEquals(originalTargetMilestones, patient.targetMilestonesById());
     }
 
     @ParameterizedTest
@@ -178,10 +193,10 @@ class TestGoalData {
         String description2 = stringGen.generate();
         GoalType goalType1 = GoalType.MINIMIZE;
         GoalType goalType2 = GoalType.MAXIMIZE;
-        ArrayList<FakeTimestampedValue> records1 = timestampedValueListGenerator_.generate();
-        ArrayList<FakeTimestampedValue> records2 = timestampedValueListGenerator_.generate();
-        ArrayList<FakeTimestampedValue> targetMilestones1 = timestampedValueListGenerator_.generate();
-        ArrayList<FakeTimestampedValue> targetMilestones2 = timestampedValueListGenerator_.generate();
+        HashMap<Long, FakeTimestampedValue> records1 = timestampedValueHashMapGenerator_.generate();
+        HashMap<Long, FakeTimestampedValue> records2 = timestampedValueHashMapGenerator_.generate();
+        HashMap<Long, FakeTimestampedValue> targetMilestones1 = timestampedValueHashMapGenerator_.generate();
+        HashMap<Long, FakeTimestampedValue> targetMilestones2 = timestampedValueHashMapGenerator_.generate();
 
         return Stream.of(
                 // equals
@@ -232,13 +247,13 @@ class TestGoalData {
     private <TimestampedType extends I_TimestampedValue> void validateAllGoalFields(String expectedName,
                                                                                     String expectedDescription,
                                                                                     GoalType expectedGoalType,
-                                                                                    ArrayList<TimestampedType> expectedRecords,
-                                                                                    ArrayList<TimestampedType> expectedTargetMilestones,
+                                                                                    HashMap<Long, TimestampedType> expectedRecords,
+                                                                                    HashMap<Long, TimestampedType> expectedTargetMilestones,
                                                                                     GoalData<TimestampedType> actualGoalData) {
         assertEquals(expectedName, actualGoalData.name());
         assertEquals(expectedDescription, actualGoalData.description());
         assertEquals(expectedGoalType, actualGoalData.goalType());
-        assertEquals(expectedRecords, actualGoalData.records());
-        assertEquals(expectedTargetMilestones, actualGoalData.targetMilestones());
+        assertEquals(expectedRecords, actualGoalData.recordsById());
+        assertEquals(expectedTargetMilestones, actualGoalData.targetMilestonesById());
     }
 }
