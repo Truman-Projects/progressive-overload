@@ -7,13 +7,17 @@ public interface I_GoalUpdater<TimestampedType extends I_TimestampedValue> {
 
     void changeGoalType(GoalType newGoalType);
 
-    void addRecord(Long recordId, TimestampedType record);
+    // returns recordId of record that was inserted
+    Long addRecord(TimestampedType record);
 
-    void removeRecord(Long recordId, TimestampedType record);
+    void removeRecord(Long recordId) throws IndexOutOfBoundsException;
 
-    void editRecord(Long recordId, TimestampedType record);
+    void editRecord(Long recordId, TimestampedType updatedRecord) throws IndexOutOfBoundsException;
 
-    void addTargetMilestone(Long milestoneId, TimestampedType targetMilestone);
+    // returns milestoneId of milestone that was inserted
+    Long addTargetMilestone(TimestampedType targetMilestone);
 
-    void removeTargetMilestone(Long milestoneId, TimestampedType targetMilestone);
+    void removeTargetMilestone(Long milestoneId) throws IndexOutOfBoundsException;
+
+    void editTargetMilestone(Long milestoneId, TimestampedType updatedMilestone) throws IndexOutOfBoundsException;
 }
