@@ -7,7 +7,7 @@ import truman.progressiveoverload.measurement.I_TimestampedValue;
 // MUST REMAIN IMMUTABLE
 public final class GoalData<TimestampedType extends I_TimestampedValue> {
 
-    private final String name_;
+    private final String name_; // Should never be changed.  Each Goal's name acts as its primary key
     private final String description_;
     private final GoalType goalType_;
     private final HashMap<Long, TimestampedType> recordsById_;
