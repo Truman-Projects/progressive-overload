@@ -9,11 +9,13 @@ public interface I_GoalUpdateListener<TimestampedType extends I_TimestampedValue
 
     void recordAdded(Long recordId, TimestampedType record);
 
-    void recordRemoved(Long recordId, TimestampedType record);
+    void recordRemoved(Long recordId);
 
-    void recordChanged(Long recordId, TimestampedType record);
+    void recordChanged(Long recordId, TimestampedType updatedRecord);
 
     void targetMilestoneAdded(Long milestoneId, TimestampedType targetMilestone);
 
-    void targetMilestoneRemoved(Long milestoneId, TimestampedType targetMilestone);
+    void targetMilestoneRemoved(Long milestoneId);
+
+    void targetMilestoneChanged(Long recordId, TimestampedType updatedRecord);
 }
