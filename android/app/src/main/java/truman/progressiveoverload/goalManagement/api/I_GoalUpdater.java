@@ -10,14 +10,14 @@ public interface I_GoalUpdater<TimestampedType extends I_TimestampedValue> {
     // returns recordId of record that was inserted
     Long addRecord(TimestampedType record);
 
-    void removeRecord(Long recordId) throws IndexOutOfBoundsException;
+    void removeRecord(Long recordId) throws InvalidQueryException;
 
-    void editRecord(Long recordId, TimestampedType updatedRecord) throws IndexOutOfBoundsException;
+    void editRecord(Long recordId, TimestampedType updatedRecord) throws InvalidQueryException;
 
     // returns milestoneId of milestone that was inserted
     Long addTargetMilestone(TimestampedType targetMilestone);
 
-    void removeTargetMilestone(Long milestoneId) throws IndexOutOfBoundsException;
+    void removeTargetMilestone(Long milestoneId) throws InvalidQueryException;
 
-    void editTargetMilestone(Long milestoneId, TimestampedType updatedMilestone) throws IndexOutOfBoundsException;
+    void editTargetMilestone(Long milestoneId, TimestampedType updatedMilestone) throws InvalidQueryException;
 }

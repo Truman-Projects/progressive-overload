@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.GoalType;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdateListener;
+import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
 import truman.progressiveoverload.measurement.FakeTimestampedValue;
 import truman.progressiveoverload.measurement.RandomFakeTimestampedValue;
@@ -174,7 +175,10 @@ class TestGoalManager {
         HashMap<Long, FakeTimestampedValue> initialRecords = initialGoalData.recordsById();
         Long recordIdToRemove = pickRandomEntryIdFromMap(initialRecords);
 
-        patient.removeRecord(recordIdToRemove);
+        try {
+            patient.removeRecord(recordIdToRemove);
+        } catch (InvalidQueryException ignore) {
+        }
 
         HashMap<Long, FakeTimestampedValue> expectedRecords = new HashMap<>(initialRecords);
         expectedRecords.remove(recordIdToRemove);
@@ -189,7 +193,10 @@ class TestGoalManager {
         HashMap<Long, FakeTimestampedValue> initialMilestones = initialGoalData.targetMilestonesById();
         Long milestoneIdToRemove = pickRandomEntryIdFromMap(initialMilestones);
 
-        patient.removeTargetMilestone(milestoneIdToRemove);
+        try {
+            patient.removeTargetMilestone(milestoneIdToRemove);
+        } catch (InvalidQueryException ignore) {
+        }
 
         HashMap<Long, FakeTimestampedValue> expectedMilestones = new HashMap<>(initialMilestones);
         expectedMilestones.remove(milestoneIdToRemove);
@@ -203,7 +210,7 @@ class TestGoalManager {
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         Long invalidRecordId = pickRandomEntryIdNotInMap(initialGoalData.recordsById());
 
-        assertThrows(IndexOutOfBoundsException.class, () -> patient.removeRecord(invalidRecordId));
+        assertThrows(InvalidQueryException.class, () -> patient.removeRecord(invalidRecordId));
     }
 
     @Test
@@ -212,7 +219,7 @@ class TestGoalManager {
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         Long invalidMilestoneId = pickRandomEntryIdNotInMap(initialGoalData.recordsById());
 
-        assertThrows(IndexOutOfBoundsException.class, () -> patient.removeTargetMilestone(invalidMilestoneId));
+        assertThrows(InvalidQueryException.class, () -> patient.removeTargetMilestone(invalidMilestoneId));
     }
 
     @Test
@@ -221,7 +228,10 @@ class TestGoalManager {
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         RandomFakeTimestampedValue valueGen = new RandomFakeTimestampedValue();
         Long firstRecordId = patient.addRecord(valueGen.generate());
-        patient.removeRecord(firstRecordId);
+        try {
+            patient.removeRecord(firstRecordId);
+        } catch (InvalidQueryException ignore) {
+        }
 
         Long secondRecordId = patient.addRecord(valueGen.generate());
 
@@ -234,7 +244,10 @@ class TestGoalManager {
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         RandomFakeTimestampedValue valueGen = new RandomFakeTimestampedValue();
         Long firstMilestoneId = patient.addTargetMilestone(valueGen.generate());
-        patient.removeTargetMilestone(firstMilestoneId);
+        try {
+            patient.removeTargetMilestone(firstMilestoneId);
+        } catch (InvalidQueryException ignore) {
+        }
 
         Long secondMilestoneId = patient.addTargetMilestone(valueGen.generate());
 
@@ -250,7 +263,10 @@ class TestGoalManager {
         FakeTimestampedValue recordAfterEditing =
                 new RandomOther<>(new RandomFakeTimestampedValue()).otherThan(new ArrayList<>(initialRecords.values()));
 
-        patient.editRecord(recordIdToEdit, recordAfterEditing);
+        try {
+            patient.editRecord(recordIdToEdit, recordAfterEditing);
+        } catch (InvalidQueryException ignore) {
+        }
 
         assertEquals(recordAfterEditing, patient.currentState().recordsById().get(recordIdToEdit));
     }
@@ -264,7 +280,10 @@ class TestGoalManager {
         FakeTimestampedValue milestoneAfterEditing =
                 new RandomOther<>(new RandomFakeTimestampedValue()).otherThan(new ArrayList<>(initialMilestones.values()));
 
-        patient.editTargetMilestone(milestoneIdToEdit, milestoneAfterEditing);
+        try {
+            patient.editTargetMilestone(milestoneIdToEdit, milestoneAfterEditing);
+        } catch (InvalidQueryException ignore) {
+        }
 
         assertEquals(milestoneAfterEditing, patient.currentState().targetMilestonesById().get(milestoneIdToEdit));
     }
@@ -276,7 +295,7 @@ class TestGoalManager {
         Long invalidRecordId = pickRandomEntryIdNotInMap(initialGoalData.recordsById());
         FakeTimestampedValue randomUpdatedRecord = new RandomFakeTimestampedValue().generate();
 
-        assertThrows(IndexOutOfBoundsException.class, () -> patient.editRecord(invalidRecordId, randomUpdatedRecord));
+        assertThrows(InvalidQueryException.class, () -> patient.editRecord(invalidRecordId, randomUpdatedRecord));
     }
 
     @Test
@@ -286,7 +305,7 @@ class TestGoalManager {
         Long invalidMilestoneId = pickRandomEntryIdNotInMap(initialGoalData.targetMilestonesById());
         FakeTimestampedValue randomUpdatedMilestone = new RandomFakeTimestampedValue().generate();
 
-        assertThrows(IndexOutOfBoundsException.class, () -> patient.editTargetMilestone(invalidMilestoneId, randomUpdatedMilestone));
+        assertThrows(InvalidQueryException.class, () -> patient.editTargetMilestone(invalidMilestoneId, randomUpdatedMilestone));
     }
 
     @Test
@@ -439,7 +458,7 @@ class TestGoalManager {
 
         try {
             patient.removeRecord(potentiallyInvalidRecordId);
-        } catch (IndexOutOfBoundsException ignore) {
+        } catch (InvalidQueryException ignore) {
         }
 
         verify(mockListener1, times(idIsValid ? 1 : 0)).recordRemoved(potentiallyInvalidRecordId);
@@ -460,7 +479,7 @@ class TestGoalManager {
 
         try {
             patient.removeTargetMilestone(potentiallyInvalidMilestoneId);
-        } catch (IndexOutOfBoundsException ignore) {
+        } catch (InvalidQueryException ignore) {
         }
 
         verify(mockListener1, times(idIsValid ? 1 : 0)).targetMilestoneRemoved(potentiallyInvalidMilestoneId);
@@ -481,7 +500,7 @@ class TestGoalManager {
 
         try {
             patient.editRecord(potentiallyInvalidRecordId, updatedRecord);
-        } catch (IndexOutOfBoundsException ignore) {
+        } catch (InvalidQueryException ignore) {
         }
 
         verify(mockListener1, times(idIsValid ? 1 : 0)).recordChanged(potentiallyInvalidRecordId, updatedRecord);
@@ -503,7 +522,7 @@ class TestGoalManager {
 
         try {
             patient.editTargetMilestone(potentiallyInvalidMilestoneId, updatedMilestone);
-        } catch (IndexOutOfBoundsException ignore) {
+        } catch (InvalidQueryException ignore) {
         }
 
         verify(mockListener1, times(idIsValid ? 1 : 0)).targetMilestoneChanged(potentiallyInvalidMilestoneId, updatedMilestone);

@@ -5,6 +5,7 @@ import truman.progressiveoverload.goalManagement.api.GoalType;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdateListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdateNotifier;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
+import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 
 interface I_GoalManager<TimestampedType extends I_TimestampedValue> extends I_GoalUpdateNotifier<TimestampedType>,
@@ -30,18 +31,18 @@ interface I_GoalManager<TimestampedType extends I_TimestampedValue> extends I_Go
     Long addRecord(TimestampedType record);
 
     @Override
-    void removeRecord(Long recordId) throws IndexOutOfBoundsException;
+    void removeRecord(Long recordId) throws InvalidQueryException;
 
     @Override
-    void editRecord(Long recordId, TimestampedType updatedRecord) throws IndexOutOfBoundsException;
+    void editRecord(Long recordId, TimestampedType updatedRecord) throws InvalidQueryException;
 
     @Override
     Long addTargetMilestone(TimestampedType targetMilestone);
 
     @Override
-    void removeTargetMilestone(Long milestoneId) throws IndexOutOfBoundsException;
+    void removeTargetMilestone(Long milestoneId) throws InvalidQueryException;
 
     @Override
-    void editTargetMilestone(Long milestoneId, TimestampedType updatedMilestone) throws IndexOutOfBoundsException;
+    void editTargetMilestone(Long milestoneId, TimestampedType updatedMilestone) throws InvalidQueryException;
 
 }

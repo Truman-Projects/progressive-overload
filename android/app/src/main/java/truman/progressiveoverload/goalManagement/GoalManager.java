@@ -8,6 +8,7 @@ import java.util.Set;
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.GoalType;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdateListener;
+import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 
 class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalManager<TimestampedType> {
@@ -77,7 +78,7 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
     }
 
     @Override
-    public void removeRecord(Long recordId) throws IndexOutOfBoundsException {
+    public void removeRecord(Long recordId) throws InvalidQueryException {
         HashMap<Long, TimestampedType> records = goalData_.recordsById();
         if (records.containsKey(recordId)) {
             records.remove(recordId);
@@ -85,12 +86,12 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
 
             notifyAllListeners(listener -> listener.recordRemoved(recordId));
         } else {
-            throw new IndexOutOfBoundsException("Attempting to remove nonexistent record ID");
+            throw new InvalidQueryException("Attempting to remove nonexistent record ID");
         }
     }
 
     @Override
-    public void editRecord(Long recordId, TimestampedType updatedRecord) throws IndexOutOfBoundsException {
+    public void editRecord(Long recordId, TimestampedType updatedRecord) throws InvalidQueryException {
         HashMap<Long, TimestampedType> records = goalData_.recordsById();
         if (records.containsKey(recordId)) {
             records.remove(recordId);
@@ -99,7 +100,7 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
 
             notifyAllListeners(listener -> listener.recordChanged(recordId, updatedRecord));
         } else {
-            throw new IndexOutOfBoundsException("Attempting to edit record with nonexistent record ID");
+            throw new InvalidQueryException("Attempting to edit record with nonexistent record ID");
         }
     }
 
@@ -116,7 +117,7 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
     }
 
     @Override
-    public void removeTargetMilestone(Long milestoneId) throws IndexOutOfBoundsException {
+    public void removeTargetMilestone(Long milestoneId) throws InvalidQueryException {
         HashMap<Long, TimestampedType> milestones = goalData_.targetMilestonesById();
         if (milestones.containsKey(milestoneId)) {
             milestones.remove(milestoneId);
@@ -124,13 +125,13 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
 
             notifyAllListeners(listener -> listener.targetMilestoneRemoved(milestoneId));
         } else {
-            throw new IndexOutOfBoundsException("Attempting to remove nonexistent milestone ID");
+            throw new InvalidQueryException("Attempting to remove nonexistent milestone ID");
         }
 
     }
 
     @Override
-    public void editTargetMilestone(Long milestoneId, TimestampedType updatedMilestone) throws IndexOutOfBoundsException {
+    public void editTargetMilestone(Long milestoneId, TimestampedType updatedMilestone) throws InvalidQueryException {
         HashMap<Long, TimestampedType> milestones = goalData_.targetMilestonesById();
         if (milestones.containsKey(milestoneId)) {
             milestones.remove(milestoneId);
@@ -139,7 +140,7 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
 
             notifyAllListeners(listener -> listener.targetMilestoneChanged(milestoneId, updatedMilestone));
         } else {
-            throw new IndexOutOfBoundsException("Attempting to edit target milestone with nonexistent milestone ID");
+            throw new InvalidQueryException("Attempting to edit target milestone with nonexistent milestone ID");
         }
     }
 
