@@ -11,5 +11,5 @@ public interface I_GoalRegistryUpdateSource<TimestampedType extends I_Timestampe
 
     HashSet<String> currentGoalNames();
 
-    I_GoalUpdateNotifier<TimestampedType> goalUpdateNotifierByName(String goalName);
+    I_GoalUpdateNotifier<TimestampedType> goalUpdateNotifierByName(String goalName) throws InvalidQueryException;
 }
