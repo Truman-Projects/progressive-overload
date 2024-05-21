@@ -35,30 +35,6 @@ class TestGoalManager {
 
     // intermediate interface to appease the mockito gods
     private interface I_FakeValueGoalUpdateListener extends I_GoalUpdateListener<FakeTimestampedValue> {
-        @Override
-        void goalDescriptionChanged(String newDescription);
-
-        @Override
-        void goalTypeChanged(GoalType newGoalType);
-
-        @Override
-        void recordAdded(Long recordId, FakeTimestampedValue record);
-
-        @Override
-        void recordRemoved(Long recordId);
-
-        @Override
-        void recordChanged(Long recordId, FakeTimestampedValue updatedRecord);
-
-        @Override
-        void targetMilestoneAdded(Long milestoneId, FakeTimestampedValue targetMilestone);
-
-        @Override
-        void targetMilestoneRemoved(Long milestoneId);
-
-        @Override
-        void targetMilestoneChanged(Long recordId, FakeTimestampedValue updatedRecord);
-
     }
 
     @Test
