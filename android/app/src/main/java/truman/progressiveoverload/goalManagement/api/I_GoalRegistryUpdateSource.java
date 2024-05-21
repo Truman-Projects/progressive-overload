@@ -1,6 +1,6 @@
 package truman.progressiveoverload.goalManagement.api;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 
@@ -9,7 +9,7 @@ public interface I_GoalRegistryUpdateSource<TimestampedType extends I_Timestampe
 
     void unregisterListener(I_GoalRegistryUpdateListener<TimestampedType> listener);
 
-    ArrayList<String> currentGoalNames();
+    HashSet<String> currentGoalNames();
 
     I_GoalUpdateNotifier<TimestampedType> goalUpdateNotifierByName(String goalName);
 }
