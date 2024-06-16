@@ -85,6 +85,19 @@ class TestGoalData {
     }
 
     @Test
+    public void withNameWillReturnCopyWithNewName() {
+        GoalData<FakeTimestampedValue> originalGoalData = new RandomGoalData().generate();
+        String newName = new RandomString().generate();
+
+        GoalData<FakeTimestampedValue> goalDataWithNewName = originalGoalData.withName(newName);
+
+        assertNotSame(originalGoalData, goalDataWithNewName);
+        validateAllGoalFields(newName, originalGoalData.description(), originalGoalData.goalType(), originalGoalData.recordsById(),
+                originalGoalData.targetMilestonesById(),
+                goalDataWithNewName);
+    }
+
+    @Test
     public void withDescriptionWillReturnCopyWithNewDescription() {
         GoalData<FakeTimestampedValue> originalGoalData = new RandomGoalData().generate();
         String newDescription = new RandomString().generate();

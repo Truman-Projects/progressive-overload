@@ -34,6 +34,10 @@ public final class GoalData<TimestampedType extends I_TimestampedValue> {
         return name_;
     }
 
+    public GoalData<TimestampedType> withName(String name) {
+        return new GoalData<>(name, description_, goalType_, recordsById_, targetMilestonesById_);
+    }
+
     public String description() {
         return description_;
     }
