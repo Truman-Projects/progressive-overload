@@ -63,6 +63,16 @@ class TestGoalManager {
     }
 
     @Test
+    public void willProvideUpdatedCurrentStateAfterChangingName() {
+        String newName = new RandomOther<>(new RandomString()).otherThan(initialGoalData_.name());
+        GoalData<FakeTimestampedValue> goalDataWithNewName = initialGoalData_.withName(newName);
+
+        patient_.changeGoalName(newName);
+
+        assertEquals(goalDataWithNewName, patient_.currentState());
+    }
+
+    @Test
     public void willProvideUpdatedCurrentStateAfterChangingDescription() {
         String newDescription = new RandomOther<>(new RandomString()).otherThan(initialGoalData_.description());
         GoalData<FakeTimestampedValue> goalDataWithNewDescription = initialGoalData_.withDescription(newDescription);
@@ -319,7 +329,7 @@ class TestGoalManager {
     }
 
     @ParameterizedTest
-    @MethodSource("willNotifyListenersWhenDescriptionChanged_data")
+    @MethodSource("willNotifyListenersWhenStringChanged_data")
     public void willNotifyListenersWhenDescriptionChanged(String initialDescription, String updatedDescription,
                                                           int timesDescriptionChanged) {
         initialGoalData_ = initialGoalData_.withDescription(initialDescription);
@@ -333,8 +343,23 @@ class TestGoalManager {
         verify(listenerList_[1], times(timesDescriptionChanged)).goalDescriptionChanged(updatedDescription);
     }
 
-    // returns (String initialDescription, String updatedDescription, int timesDescriptionChanged)
-    private static Stream<Arguments> willNotifyListenersWhenDescriptionChanged_data() {
+    @ParameterizedTest
+    @MethodSource("willNotifyListenersWhenStringChanged_data")
+    public void willNotifyListenersWhenNameChanged(String initialName, String updatedName,
+                                                   int timesNameChanged) {
+        initialGoalData_ = initialGoalData_.withName(initialName);
+        resetPatient();
+        patient_.registerListener(listenerList_[0]);
+        patient_.registerListener(listenerList_[1]);
+
+        patient_.changeGoalName(updatedName);
+
+        verify(listenerList_[0], times(timesNameChanged)).goalNameChanged(updatedName);
+        verify(listenerList_[1], times(timesNameChanged)).goalNameChanged(updatedName);
+    }
+
+    // returns (String initialString, String updatedString, int timesStringChanged)
+    private static Stream<Arguments> willNotifyListenersWhenStringChanged_data() {
         RandomString stringGen = new RandomString();
         String string1 = stringGen.generate();
         String string2 = new RandomOther<>(stringGen).otherThan(string1);

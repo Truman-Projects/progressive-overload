@@ -10,9 +10,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
-import truman.progressiveoverload.goalManagement.api.DuplicateEntryException;
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalNotifier;
@@ -21,9 +23,10 @@ import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
 import truman.progressiveoverload.measurement.FakeTimestampedValue;
 import truman.progressiveoverload.randomUtilities.RandomArrayList;
+import truman.progressiveoverload.randomUtilities.RandomHashMap;
 import truman.progressiveoverload.randomUtilities.RandomInt;
+import truman.progressiveoverload.randomUtilities.RandomLong;
 import truman.progressiveoverload.randomUtilities.RandomOther;
-import truman.progressiveoverload.randomUtilities.RandomString;
 
 class TestGoalRegistry {
     // intermediate interfaces to appease the mockito gods
@@ -50,50 +53,50 @@ class TestGoalRegistry {
     }
 
     @Test
-    public void willReturnNamesOfAllAddedGoals() {
+    public void willReturnIdsOfAllAddedGoals() {
         int numberOfGoals = new RandomInt().generate(1, 5);
-        ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataListWithUniqueNames =
-                generateRandomGoalDataListWithUniqueNames(numberOfGoals);
-        HashSet<String> expectedGoalDataNames = new HashSet<>();
-        for (GoalData<FakeTimestampedValue> goal : randomGoalDataListWithUniqueNames) {
-            expectedGoalDataNames.add(goal.name());
+        ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataList =
+                new RandomArrayList<>(randomGoalDataGenerator_).generate(numberOfGoals);
+        HashSet<Long> expectedGoalDataIDs = new HashSet<>();
+        for (GoalData<FakeTimestampedValue> goal : randomGoalDataList) {
             prepareGoalManagerFactoryToCreateGoal(goal);
-            failOnException(() -> patient_.addGoal(goal));
+            Long goalId = patient_.addGoal(goal);
+            expectedGoalDataIDs.add(goalId);
         }
 
-        HashSet<String> queriedGoalDataNames = patient_.currentGoalNames();
+        HashSet<Long> queriedGoalDataIDs = patient_.currentGoalIds();
 
-        assertEquals(expectedGoalDataNames, queriedGoalDataNames);
+        assertEquals(expectedGoalDataIDs, queriedGoalDataIDs);
     }
 
     @Test
-    public void willNotReturnNamesOfRemovedGoals() {
+    public void willNotReturnIDsOfRemovedGoals() {
         final int NUMBER_OF_GOALS = 5;
-        ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataListWithUniqueNames =
-                generateRandomGoalDataListWithUniqueNames(NUMBER_OF_GOALS);
-        HashSet<String> goalDataNames = new HashSet<>();
-        for (GoalData<FakeTimestampedValue> goal : randomGoalDataListWithUniqueNames) {
-            goalDataNames.add(goal.name());
+        ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataList =
+                new RandomArrayList<>(randomGoalDataGenerator_).generate(NUMBER_OF_GOALS);
+        HashSet<Long> goalIDs = new HashSet<>();
+        for (GoalData<FakeTimestampedValue> goal : randomGoalDataList) {
             prepareGoalManagerFactoryToCreateGoal(goal);
-            failOnException(() -> patient_.addGoal(goal));
+            Long goalID = patient_.addGoal(goal);
+            goalIDs.add(goalID);
         }
-        String[] goalNamesAsList = goalDataNames.toArray(new String[NUMBER_OF_GOALS]);
-        int indexInGoalNameListToRemove = new RandomInt().generate(0, NUMBER_OF_GOALS);
-        String goalNameToRemove = goalNamesAsList[indexInGoalNameListToRemove];
-        failOnException(() -> patient_.removeGoal(goalNameToRemove));
-        goalDataNames.remove(goalNameToRemove);
+        Long[] goalIDsAsList = goalIDs.toArray(new Long[NUMBER_OF_GOALS]);
+        int indexInGoalIDListToRemove = new RandomInt().generate(0, NUMBER_OF_GOALS);
+        Long goalIDToRemove = goalIDsAsList[indexInGoalIDListToRemove];
+        failOnException(() -> patient_.removeGoal(goalIDToRemove));
+        goalIDs.remove(goalIDToRemove);
 
-        HashSet<String> queriedGoalDataNames = patient_.currentGoalNames();
+        HashSet<Long> queriedGoalIDs = patient_.currentGoalIds();
 
-        assertEquals(goalDataNames, queriedGoalDataNames);
+        assertEquals(goalIDs, queriedGoalIDs);
     }
 
     @Test
-    public void willThrowExceptionWhenRemovingNonExistentGoalName() {
+    public void willThrowExceptionWhenRemovingNonExistentGoalId() {
         injectRandomGoalsIntoPatient();
-        String nonExistentGoalName = new RandomOther<>(new RandomString()).otherThan(patient_.currentGoalNames());
+        Long nonExistentGoalId = new RandomOther<>(new RandomLong()).otherThan(patient_.currentGoalIds());
 
-        assertThrows(InvalidQueryException.class, () -> patient_.removeGoal(nonExistentGoalName));
+        assertThrows(InvalidQueryException.class, () -> patient_.removeGoal(nonExistentGoalId));
 
     }
 
@@ -102,21 +105,23 @@ class TestGoalRegistry {
         GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
         prepareGoalManagerFactoryToCreateGoal(randomGoalData);
 
-        failOnException(() -> patient_.addGoal(randomGoalData));
+        patient_.addGoal(randomGoalData);
 
         verify(goalManagerFactory_, times(1)).createGoalManager(randomGoalData);
     }
 
     @Test
-    public void willThrowExceptionWhenAddingGoalWithExistingGoalName() {
-        String goalName = new RandomString().generate();
-        GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate().withName(goalName);
-        GoalData<FakeTimestampedValue> randomGoalDataWithRepeatedName = randomGoalDataGenerator_.generate().withName(goalName);
-        failOnException(() -> patient_.addGoal(randomGoalData));
+    public void willNotReuseRemovedGoalIds() {
+        GoalData<FakeTimestampedValue> randomGoal1 = randomGoalDataGenerator_.generate();
+        GoalData<FakeTimestampedValue> randomGoal2 = randomGoalDataGenerator_.generate();
+        Long firstGoalId = patient_.addGoal(randomGoal1);
+        failOnException(() -> patient_.removeGoal(firstGoalId));
 
-        assertThrows(DuplicateEntryException.class, () -> patient_.addGoal(randomGoalDataWithRepeatedName));
+        Long secondGoalId = patient_.addGoal(randomGoal2);
 
+        assertNotEquals(firstGoalId, secondGoalId);
     }
+
 
     @Test
     public void willReturnCorrectGoalUpdateNotifier() {
@@ -124,10 +129,10 @@ class TestGoalRegistry {
         GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
         I_GoalManager<FakeTimestampedValue> mockGoalManager = mock(I_FakeValueGoalManager.class);
         when(goalManagerFactory_.createGoalManager(randomGoalData)).thenReturn(mockGoalManager);
-        failOnException(() -> patient_.addGoal(randomGoalData));
+        Long goalId = patient_.addGoal(randomGoalData);
 
         try {
-            I_GoalNotifier<FakeTimestampedValue> retrievedUpdateNotifier = patient_.goalUpdateNotifierByName(randomGoalData.name());
+            I_GoalNotifier<FakeTimestampedValue> retrievedUpdateNotifier = patient_.goalUpdateNotifierByGoalId(goalId);
             assertSame(mockGoalManager, retrievedUpdateNotifier);
         } catch (InvalidQueryException e) {
             fail("Caught unexpected exception");
@@ -135,11 +140,11 @@ class TestGoalRegistry {
     }
 
     @Test
-    public void willThrowExceptionWhenFetchingUpdateNotifierWithNonExistentName() {
+    public void willThrowExceptionWhenFetchingUpdateNotifierWithNonExistentId() {
         injectRandomGoalsIntoPatient();
-        String nonExistentGoalName = new RandomOther<>(new RandomString()).otherThan(patient_.currentGoalNames());
+        Long nonExistentGoalId = new RandomOther<>(new RandomLong()).otherThan(patient_.currentGoalIds());
 
-        assertThrows(InvalidQueryException.class, () -> patient_.goalUpdateNotifierByName(nonExistentGoalName));
+        assertThrows(InvalidQueryException.class, () -> patient_.goalUpdateNotifierByGoalId(nonExistentGoalId));
     }
 
     @Test
@@ -148,10 +153,10 @@ class TestGoalRegistry {
         GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
         I_GoalManager<FakeTimestampedValue> mockGoalManager = mock(I_FakeValueGoalManager.class);
         when(goalManagerFactory_.createGoalManager(randomGoalData)).thenReturn(mockGoalManager);
-        failOnException(() -> patient_.addGoal(randomGoalData));
+        Long goalId = patient_.addGoal(randomGoalData);
 
         try {
-            I_GoalUpdater<FakeTimestampedValue> retrievedGoalUpdater = patient_.goalUpdaterByName(randomGoalData.name());
+            I_GoalUpdater<FakeTimestampedValue> retrievedGoalUpdater = patient_.goalUpdaterByGoalId(goalId);
             assertSame(mockGoalManager, retrievedGoalUpdater);
         } catch (InvalidQueryException e) {
             fail("Caught unexpected exception");
@@ -161,9 +166,9 @@ class TestGoalRegistry {
     @Test
     public void willThrowExceptionWhenFetchingGoalUpdaterWithNonExistentName() {
         injectRandomGoalsIntoPatient();
-        String nonExistentGoalName = new RandomOther<>(new RandomString()).otherThan(patient_.currentGoalNames());
+        Long nonExistentGoalId = new RandomOther<>(new RandomLong()).otherThan(patient_.currentGoalIds());
 
-        assertThrows(InvalidQueryException.class, () -> patient_.goalUpdaterByName(nonExistentGoalName));
+        assertThrows(InvalidQueryException.class, () -> patient_.goalUpdaterByGoalId(nonExistentGoalId));
     }
 
     @Test
@@ -172,28 +177,24 @@ class TestGoalRegistry {
         patient_.registerListener(listenerList_[0]);
         GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
 
-        failOnException(() -> patient_.addGoal(randomGoalData));
+        Long goalId = patient_.addGoal(randomGoalData);
 
-        verify(listenerList_[0], times(1)).goalAdded(randomGoalData.name());
+        verify(listenerList_[0], times(1)).goalAdded(goalId);
 
     }
 
     @Test
-    public void willOnlyNotifyListenersWhenGoalSuccessfullyAdded() {
-        String goalName = new RandomString().generate();
-        GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate().withName(goalName);
-        GoalData<FakeTimestampedValue> randomGoalDataWithRepeatedName = randomGoalDataGenerator_.generate().withName(goalName);
+    public void willNotifyListenersWhenGoalSuccessfullyAdded() {
+        GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
         prepareGoalManagerFactoryToCreateGoal(randomGoalData);
         patient_.registerListener(listenerList_[0]);
         patient_.registerListener(listenerList_[1]);
 
-        failOnException(() -> patient_.addGoal(randomGoalData));
-        // second call to addGoal should fail
-        ignoreAnyExceptions(() -> patient_.addGoal(randomGoalDataWithRepeatedName));
+        Long goalId = patient_.addGoal(randomGoalData);
 
 
-        verify(listenerList_[0], times(1)).goalAdded(goalName);
-        verify(listenerList_[1], times(1)).goalAdded(goalName);
+        verify(listenerList_[0], times(1)).goalAdded(goalId);
+        verify(listenerList_[1], times(1)).goalAdded(goalId);
     }
 
     @Test
@@ -202,14 +203,14 @@ class TestGoalRegistry {
         prepareGoalManagerFactoryToCreateGoal(randomGoalData);
         patient_.registerListener(listenerList_[0]);
         patient_.registerListener(listenerList_[1]);
-        failOnException(() -> patient_.addGoal(randomGoalData));
+        Long goalId = patient_.addGoal(randomGoalData);
 
-        failOnException(() -> patient_.removeGoal(randomGoalData.name()));
+        failOnException(() -> patient_.removeGoal(goalId));
         // second call to removeGoal should fail
-        ignoreAnyExceptions(() -> patient_.removeGoal(randomGoalData.name()));
+        ignoreAnyExceptions(() -> patient_.removeGoal(goalId));
 
-        verify(listenerList_[0], times(1)).goalRemoved(randomGoalData.name());
-        verify(listenerList_[1], times(1)).goalRemoved(randomGoalData.name());
+        verify(listenerList_[0], times(1)).goalRemoved(goalId);
+        verify(listenerList_[1], times(1)).goalRemoved(goalId);
     }
 
     @Test
@@ -219,9 +220,9 @@ class TestGoalRegistry {
         patient_.registerListener(listenerList_[0]);
         patient_.unregisterListener(listenerList_[0]);
 
-        failOnException(() -> patient_.addGoal(randomGoalData));
+        Long goalId = patient_.addGoal(randomGoalData);
 
-        verify(listenerList_[0], times(0)).goalAdded(randomGoalData.name());
+        verify(listenerList_[0], times(0)).goalAdded(goalId);
 
     }
 
@@ -234,25 +235,79 @@ class TestGoalRegistry {
         // only the 0th listener is removed. 1st listener remains
         patient_.unregisterListener(listenerList_[0]);
 
-        failOnException(() -> patient_.addGoal(randomGoalData));
+        Long goalId = patient_.addGoal(randomGoalData);
 
-        verify(listenerList_[1], times(1)).goalAdded(randomGoalData.name());
+        verify(listenerList_[1], times(1)).goalAdded(goalId);
     }
 
+    @Test
+    public void willNotInitializeIfRegistryNotEmpty() {
+        patient_.addGoal(randomGoalDataGenerator_.generate());
+        HashMap<Long, GoalData<FakeTimestampedValue>> goalsFromPersistenceSource = new RandomHashMap<>(new RandomLong(),
+                randomGoalDataGenerator_).generate();
 
-    private ArrayList<GoalData<FakeTimestampedValue>> generateRandomGoalDataListWithUniqueNames(int size) {
-        ArrayList<String> uniqueGoalNames = new ArrayList<>();
-        ArrayList<GoalData<FakeTimestampedValue>> goalDataListWithUniqueNames = new ArrayList<>();
+        patient_.initializeWithExistingGoals(goalsFromPersistenceSource);
 
-        RandomOther<String> uniqueStringGenerator = new RandomOther<>(new RandomString());
-        ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataList = new RandomArrayList<>(randomGoalDataGenerator_).generate(size);
-        for (int index = 0; index < size; index++) {
-            String goalNameForIndex = uniqueStringGenerator.otherThan(uniqueGoalNames);
-            uniqueGoalNames.add(goalNameForIndex);
-            goalDataListWithUniqueNames.add(randomGoalDataList.get(index).withName(goalNameForIndex));
+        assertEquals(1, patient_.currentGoalIds().size());
+    }
+
+    @Test
+    public void willRequestGoalManagersWhenInitializing() {
+        HashMap<Long, GoalData<FakeTimestampedValue>> goalsFromPersistenceSource = new RandomHashMap<>(new RandomLong(),
+                randomGoalDataGenerator_).generate();
+
+        patient_.initializeWithExistingGoals(goalsFromPersistenceSource);
+
+        for (GoalData<FakeTimestampedValue> goalData : goalsFromPersistenceSource.values()) {
+            verify(goalManagerFactory_, times(1)).createGoalManager(goalData);
+        }
+    }
+
+    @Test
+    public void willReturnCorrectGoalUpdatersAfterInitializing() {
+        HashMap<Long, GoalData<FakeTimestampedValue>> goalsFromPersistenceSource = new RandomHashMap<>(new RandomLong(),
+                randomGoalDataGenerator_).generate();
+        HashMap<Long, I_GoalManager<FakeTimestampedValue>> expectedGoalManagersByGoalId = new HashMap<>();
+        for (Map.Entry<Long, GoalData<FakeTimestampedValue>> idAndGoalData : goalsFromPersistenceSource.entrySet()) {
+            I_GoalManager<FakeTimestampedValue> mockGoalManager = mock(I_FakeValueGoalManager.class);
+            when(goalManagerFactory_.createGoalManager(idAndGoalData.getValue())).thenReturn(mockGoalManager);
+            expectedGoalManagersByGoalId.put(idAndGoalData.getKey(), mockGoalManager);
         }
 
-        return goalDataListWithUniqueNames;
+        patient_.initializeWithExistingGoals(goalsFromPersistenceSource);
+
+        for (Map.Entry<Long, I_GoalManager<FakeTimestampedValue>> idAndExpectedManagers : expectedGoalManagersByGoalId.entrySet()) {
+            Long goalId = idAndExpectedManagers.getKey();
+            I_GoalUpdater<FakeTimestampedValue> expectedGoalUpdater = idAndExpectedManagers.getValue();
+            try {
+                I_GoalUpdater<FakeTimestampedValue> actualGoalUpdater = patient_.goalUpdaterByGoalId(goalId);
+                assertSame(expectedGoalUpdater, actualGoalUpdater);
+            } catch (InvalidQueryException e) {
+                fail("Caught unexpected exception");
+            }
+        }
+    }
+
+    @Test
+    public void willReturnCorrectGoalIdsAfterInitializing() {
+        HashMap<Long, GoalData<FakeTimestampedValue>> goalsFromPersistenceSource = new RandomHashMap<>(new RandomLong(),
+                randomGoalDataGenerator_).generate();
+        HashSet<Long> expectedGoalIds = new HashSet<>(goalsFromPersistenceSource.keySet());
+
+        patient_.initializeWithExistingGoals(goalsFromPersistenceSource);
+
+        assertEquals(expectedGoalIds, patient_.currentGoalIds());
+    }
+
+    @Test
+    public void willCorrectlyIncrementGoalIdsAfterInitializing() {
+        HashMap<Long, GoalData<FakeTimestampedValue>> goalsFromPersistenceSource = new RandomHashMap<>(new RandomLong(),
+                randomGoalDataGenerator_).generate();
+        Long expectedNextGoalId = Collections.max(goalsFromPersistenceSource.keySet()) + 1L;
+
+        patient_.initializeWithExistingGoals(goalsFromPersistenceSource);
+
+        assertEquals(expectedNextGoalId, patient_.addGoal(randomGoalDataGenerator_.generate()));
     }
 
     private void prepareGoalManagerFactoryToCreateGoal(GoalData<FakeTimestampedValue> goalData) {
@@ -266,7 +321,7 @@ class TestGoalRegistry {
                 new RandomArrayList<>(randomGoalDataGenerator_).generate(numberGoalsToInject);
         for (GoalData<FakeTimestampedValue> goal : randomGoalDataList) {
             prepareGoalManagerFactoryToCreateGoal(goal);
-            ignoreAnyExceptions(() -> patient_.addGoal(goal));
+            patient_.addGoal(goal);
         }
     }
 

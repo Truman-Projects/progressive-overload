@@ -1,8 +1,8 @@
 package truman.progressiveoverload.goalManagement;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
-import truman.progressiveoverload.goalManagement.api.DuplicateEntryException;
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryNotifier;
@@ -22,19 +22,21 @@ interface I_GoalRegistry<TimestampedType extends I_TimestampedValue> extends I_G
     void unregisterListener(I_GoalRegistryListener listener);
 
     @Override
-    HashSet<String> currentGoalNames();
+    HashSet<Long> currentGoalIds();
 
     @Override
-    I_GoalNotifier<TimestampedType> goalUpdateNotifierByName(String goalName) throws InvalidQueryException;
+    I_GoalNotifier<TimestampedType> goalUpdateNotifierByGoalId(Long goalId) throws InvalidQueryException;
 
     // I_GoalRegistryUpdater
     @Override
-    I_GoalUpdater<TimestampedType> goalUpdaterByName(String goalName) throws InvalidQueryException;
+    I_GoalUpdater<TimestampedType> goalUpdaterByGoalId(Long goalId) throws InvalidQueryException;
 
     @Override
-    void addGoal(GoalData<TimestampedType> goalData) throws DuplicateEntryException;
+    Long addGoal(GoalData<TimestampedType> goalData);
 
     @Override
-    void removeGoal(String goalName) throws InvalidQueryException;
+    void removeGoal(Long goalId) throws InvalidQueryException;
 
+    // not exposed through any public interfaces; intended only for initialization
+    void initializeWithExistingGoals(HashMap<Long, GoalData<TimestampedType>> goalsById);
 }

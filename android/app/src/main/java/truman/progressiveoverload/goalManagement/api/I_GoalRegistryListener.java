@@ -1,7 +1,7 @@
 package truman.progressiveoverload.goalManagement.api;
 
 public interface I_GoalRegistryListener {
-    void goalAdded(String goalName);
+    void goalAdded(Long goalId);
 
-    void goalRemoved(String goalName);
+    void goalRemoved(Long goalId);
 }

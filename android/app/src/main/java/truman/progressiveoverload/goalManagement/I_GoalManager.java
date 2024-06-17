@@ -22,6 +22,9 @@ interface I_GoalManager<TimestampedType extends I_TimestampedValue> extends I_Go
 
     // I_GoalUpdater
     @Override
+    void changeGoalName(String newName);
+
+    @Override
     void changeGoalDescription(String newDescription);
 
     @Override

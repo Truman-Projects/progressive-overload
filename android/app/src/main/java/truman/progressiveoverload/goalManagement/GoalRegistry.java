@@ -2,8 +2,8 @@ package truman.progressiveoverload.goalManagement;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
-import truman.progressiveoverload.goalManagement.api.DuplicateEntryException;
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalNotifier;
@@ -13,16 +13,19 @@ import truman.progressiveoverload.measurement.I_TimestampedValue;
 
 class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_GoalRegistry<TimestampedType> {
     private final I_GoalManagerFactory<TimestampedType> goalManagerFactory_;
-    private final HashMap<String, I_GoalManager<TimestampedType>> goalManagersByGoalNames_;
+    private final HashMap<Long, I_GoalManager<TimestampedType>> goalManagersByGoalIds_;
+    private Long largestGoalId_;
     private final HashSet<I_GoalRegistryListener> listeners_;
 
     public GoalRegistry(
             I_GoalManagerFactory<TimestampedType> goalManagerFactory) {
         goalManagerFactory_ = goalManagerFactory;
-        goalManagersByGoalNames_ = new HashMap<>();
+        goalManagersByGoalIds_ = new HashMap<>();
+        largestGoalId_ = -1L;
         listeners_ = new HashSet<>();
     }
 
+    // I_GoalRegistryNotifier
     @Override
     public void registerListener(I_GoalRegistryListener listener) {
         listeners_.add(listener);
@@ -34,47 +37,62 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
     }
 
     @Override
-    public HashSet<String> currentGoalNames() {
-        return new HashSet<>(goalManagersByGoalNames_.keySet());
+    public HashSet<Long> currentGoalIds() {
+        return new HashSet<>(goalManagersByGoalIds_.keySet());
     }
 
     @Override
-    public I_GoalNotifier<TimestampedType> goalUpdateNotifierByName(String goalName) throws InvalidQueryException {
-        if (!goalManagersByGoalNames_.containsKey(goalName)) {
-            throw new InvalidQueryException("No goal update notifier with matching goal name");
+    public I_GoalNotifier<TimestampedType> goalUpdateNotifierByGoalId(Long goalId) throws InvalidQueryException {
+        if (!goalManagersByGoalIds_.containsKey(goalId)) {
+            throw new InvalidQueryException("No goal update notifier with matching goal ID");
         }
-        return goalManagersByGoalNames_.get(goalName);
+        return goalManagersByGoalIds_.get(goalId);
     }
 
-
+    // I_GoalRegistryUpdater
     @Override
-    public I_GoalUpdater<TimestampedType> goalUpdaterByName(String goalName) throws InvalidQueryException {
-        if (!goalManagersByGoalNames_.containsKey(goalName)) {
-            throw new InvalidQueryException("No goal updater with matching goal name");
+    public I_GoalUpdater<TimestampedType> goalUpdaterByGoalId(Long goalId) throws InvalidQueryException {
+        if (!goalManagersByGoalIds_.containsKey(goalId)) {
+            throw new InvalidQueryException("No goal updater with matching goal ID");
         }
-        return goalManagersByGoalNames_.get(goalName);
+        return goalManagersByGoalIds_.get(goalId);
     }
 
     @Override
-    public void addGoal(GoalData<TimestampedType> goalData) throws DuplicateEntryException {
-        String goalName = goalData.name();
-        if (goalManagersByGoalNames_.containsKey(goalName)) {
-            throw new DuplicateEntryException("Attempting to add goal with existing goal name");
-        }
-        goalManagersByGoalNames_.put(goalName, goalManagerFactory_.createGoalManager(goalData));
+    public Long addGoal(GoalData<TimestampedType> goalData) {
+        Long newGoalId = largestGoalId_ + 1;
+        goalManagersByGoalIds_.put(newGoalId, goalManagerFactory_.createGoalManager(goalData));
         for (I_GoalRegistryListener listener : listeners_) {
-            listener.goalAdded(goalName);
+            listener.goalAdded(newGoalId);
         }
+        largestGoalId_ = newGoalId;
+        return newGoalId;
     }
 
     @Override
-    public void removeGoal(String goalName) throws InvalidQueryException {
-        if (!goalManagersByGoalNames_.containsKey(goalName)) {
-            throw new InvalidQueryException("Attempting to remove non-existent goal name");
+    public void removeGoal(Long goalId) throws InvalidQueryException {
+        if (!goalManagersByGoalIds_.containsKey(goalId)) {
+            throw new InvalidQueryException("Attempting to remove non-existent goal ID");
         }
-        goalManagersByGoalNames_.remove(goalName);
+        goalManagersByGoalIds_.remove(goalId);
         for (I_GoalRegistryListener listener : listeners_) {
-            listener.goalRemoved(goalName);
+            listener.goalRemoved(goalId);
+        }
+    }
+
+    //I_GoalRegistry
+    @Override
+    public void initializeWithExistingGoals(HashMap<Long, GoalData<TimestampedType>> goalsById) {
+        if (largestGoalId_.equals(-1L)) {
+            for (Map.Entry<Long, GoalData<TimestampedType>> idAndData : goalsById.entrySet()) {
+                Long goalId = idAndData.getKey();
+                GoalData<TimestampedType> goalData = idAndData.getValue();
+                I_GoalManager<TimestampedType> manager = goalManagerFactory_.createGoalManager(goalData);
+                goalManagersByGoalIds_.put(goalId, manager);
+                if (goalId > largestGoalId_) {
+                    largestGoalId_ = goalId;
+                }
+            }
         }
     }
 }

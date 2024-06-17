@@ -3,6 +3,8 @@ package truman.progressiveoverload.goalManagement.api;
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 
 public interface I_GoalUpdater<TimestampedType extends I_TimestampedValue> {
+    void changeGoalName(String newName);
+
     void changeGoalDescription(String newDescription);
 
     void changeGoalType(GoalType newGoalType);

@@ -47,6 +47,15 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
 
     // I_GoalUpdater
     @Override
+    public void changeGoalName(String newName) {
+        final String originalName = goalData_.name();
+        goalData_ = goalData_.withName(newName);
+        if (!originalName.equals(newName)) {
+            notifyAllListeners(listener -> listener.goalNameChanged(newName));
+        }
+    }
+
+    @Override
     public void changeGoalDescription(String newDescription) {
         final String originalDescription = goalData_.description();
         goalData_ = goalData_.withDescription(newDescription);

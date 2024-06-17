@@ -9,7 +9,7 @@ public interface I_GoalRegistryNotifier<TimestampedType extends I_TimestampedVal
 
     void unregisterListener(I_GoalRegistryListener listener);
 
-    HashSet<String> currentGoalNames();
+    HashSet<Long> currentGoalIds();
 
-    I_GoalNotifier<TimestampedType> goalUpdateNotifierByName(String goalName) throws InvalidQueryException;
+    I_GoalNotifier<TimestampedType> goalUpdateNotifierByGoalId(Long goalId) throws InvalidQueryException;
 }
