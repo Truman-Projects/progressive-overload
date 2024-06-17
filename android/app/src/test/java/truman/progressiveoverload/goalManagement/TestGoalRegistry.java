@@ -51,7 +51,9 @@ class TestGoalRegistry {
 
     @Test
     public void willReturnNamesOfAllAddedGoals() {
-        ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataListWithUniqueNames = generateRandomGoalDataListWithUniqueName(5);
+        int numberOfGoals = new RandomInt().generate(1, 5);
+        ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataListWithUniqueNames =
+                generateRandomGoalDataListWithUniqueName(numberOfGoals);
         HashSet<String> expectedGoalDataNames = new HashSet<>();
         for (GoalData<FakeTimestampedValue> goal : randomGoalDataListWithUniqueNames) {
             expectedGoalDataNames.add(goal.name());
