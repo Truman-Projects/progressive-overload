@@ -53,7 +53,7 @@ class TestGoalRegistry {
     public void willReturnNamesOfAllAddedGoals() {
         int numberOfGoals = new RandomInt().generate(1, 5);
         ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataListWithUniqueNames =
-                generateRandomGoalDataListWithUniqueName(numberOfGoals);
+                generateRandomGoalDataListWithUniqueNames(numberOfGoals);
         HashSet<String> expectedGoalDataNames = new HashSet<>();
         for (GoalData<FakeTimestampedValue> goal : randomGoalDataListWithUniqueNames) {
             expectedGoalDataNames.add(goal.name());
@@ -70,7 +70,7 @@ class TestGoalRegistry {
     public void willNotReturnNamesOfRemovedGoals() {
         final int NUMBER_OF_GOALS = 5;
         ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataListWithUniqueNames =
-                generateRandomGoalDataListWithUniqueName(NUMBER_OF_GOALS);
+                generateRandomGoalDataListWithUniqueNames(NUMBER_OF_GOALS);
         HashSet<String> goalDataNames = new HashSet<>();
         for (GoalData<FakeTimestampedValue> goal : randomGoalDataListWithUniqueNames) {
             goalDataNames.add(goal.name());
@@ -240,7 +240,7 @@ class TestGoalRegistry {
     }
 
 
-    private ArrayList<GoalData<FakeTimestampedValue>> generateRandomGoalDataListWithUniqueName(int size) {
+    private ArrayList<GoalData<FakeTimestampedValue>> generateRandomGoalDataListWithUniqueNames(int size) {
         ArrayList<String> uniqueGoalNames = new ArrayList<>();
         ArrayList<GoalData<FakeTimestampedValue>> goalDataListWithUniqueNames = new ArrayList<>();
 
