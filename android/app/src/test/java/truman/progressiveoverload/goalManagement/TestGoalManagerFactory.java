@@ -10,6 +10,16 @@ import truman.progressiveoverload.measurement.FakeTimestampedValue;
 
 class TestGoalManagerFactory {
     @Test
+    public void willCreateCorrectTypeOfGoalManager() {
+        GoalManagerFactory<FakeTimestampedValue> patient = new GoalManagerFactory<>();
+
+        I_GoalManager<FakeTimestampedValue> goalManager = patient.createGoalManager(new RandomGoalData().generate());
+
+        assertTrue(goalManager instanceof GoalManager);
+
+    }
+
+    @Test
     public void willCreateGoalManagerWithCorrectInitialState() {
         GoalData<FakeTimestampedValue> goalManagerInitialState = new RandomGoalData().generate();
         GoalManagerFactory<FakeTimestampedValue> patient = new GoalManagerFactory<>();
