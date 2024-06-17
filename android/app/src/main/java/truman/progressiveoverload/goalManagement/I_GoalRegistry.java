@@ -16,10 +16,10 @@ interface I_GoalRegistry<TimestampedType extends I_TimestampedValue> extends I_G
         I_GoalRegistryUpdater<TimestampedType> {
     // I_GoalRegistryUpdateSource
     @Override
-    void registerListener(I_GoalRegistryListener<TimestampedType> listener);
+    void registerListener(I_GoalRegistryListener listener);
 
     @Override
-    void unregisterListener(I_GoalRegistryListener<TimestampedType> listener);
+    void unregisterListener(I_GoalRegistryListener listener);
 
     @Override
     HashSet<String> currentGoalNames();

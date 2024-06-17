@@ -34,19 +34,17 @@ class TestGoalRegistry {
     private interface I_FakeValueGoalManager extends I_GoalManager<FakeTimestampedValue> {
     }
 
-    private interface I_FakeGoalRegistryListener extends I_GoalRegistryListener<FakeTimestampedValue> {
-    }
 
     private final RandomGoalData randomGoalDataGenerator_ = new RandomGoalData();
-    private I_FakeGoalRegistryListener[] listenerList_;
+    private I_GoalRegistryListener[] listenerList_;
     private I_FakeValueGoalManagerFactory goalManagerFactory_;
     private GoalRegistry<FakeTimestampedValue> patient_;
 
     @BeforeEach
     public void resetEverything() {
-        listenerList_ = new I_FakeGoalRegistryListener[]{
-                mock(I_FakeGoalRegistryListener.class),
-                mock(I_FakeGoalRegistryListener.class)};
+        listenerList_ = new I_GoalRegistryListener[]{
+                mock(I_GoalRegistryListener.class),
+                mock(I_GoalRegistryListener.class)};
         goalManagerFactory_ = mock(I_FakeValueGoalManagerFactory.class);
         patient_ = new GoalRegistry<>(goalManagerFactory_);
     }

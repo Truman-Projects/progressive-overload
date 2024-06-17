@@ -14,7 +14,7 @@ import truman.progressiveoverload.measurement.I_TimestampedValue;
 class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_GoalRegistry<TimestampedType> {
     private final I_GoalManagerFactory<TimestampedType> goalManagerFactory_;
     private final HashMap<String, I_GoalManager<TimestampedType>> goalManagersByGoalNames_;
-    private final HashSet<I_GoalRegistryListener<TimestampedType>> listeners_;
+    private final HashSet<I_GoalRegistryListener> listeners_;
 
     public GoalRegistry(
             I_GoalManagerFactory<TimestampedType> goalManagerFactory) {
@@ -24,12 +24,12 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
     }
 
     @Override
-    public void registerListener(I_GoalRegistryListener<TimestampedType> listener) {
+    public void registerListener(I_GoalRegistryListener listener) {
         listeners_.add(listener);
     }
 
     @Override
-    public void unregisterListener(I_GoalRegistryListener<TimestampedType> listener) {
+    public void unregisterListener(I_GoalRegistryListener listener) {
         listeners_.remove(listener);
     }
 
@@ -62,7 +62,7 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
             throw new DuplicateEntryException("Attempting to add goal with existing goal name");
         }
         goalManagersByGoalNames_.put(goalName, goalManagerFactory_.createGoalManager(goalData));
-        for (I_GoalRegistryListener<TimestampedType> listener : listeners_) {
+        for (I_GoalRegistryListener listener : listeners_) {
             listener.goalAdded(goalName);
         }
     }
@@ -73,7 +73,7 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
             throw new InvalidQueryException("Attempting to remove non-existent goal name");
         }
         goalManagersByGoalNames_.remove(goalName);
-        for (I_GoalRegistryListener<TimestampedType> listener : listeners_) {
+        for (I_GoalRegistryListener listener : listeners_) {
             listener.goalRemoved(goalName);
         }
     }
