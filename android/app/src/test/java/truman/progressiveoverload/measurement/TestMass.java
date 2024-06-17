@@ -32,7 +32,7 @@ public class TestMass {
         Mass patient = new Mass(randomMilligrams);
 
         double actualGrams = patient.toGrams();
-        assertEquals(expectedGrams, actualGrams, 1e-7);
+        assertDoubleFuzzyEquals(expectedGrams, actualGrams);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class TestMass {
         Mass patient = new Mass(randomMilligrams);
 
         double actualKilos = patient.toKilograms();
-        assertEquals(expectedKilos, actualKilos, 1e-7);
+        assertDoubleFuzzyEquals(expectedKilos, actualKilos);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class TestMass {
         Mass patient = new Mass(randomMilligrams);
 
         double actualPounds = patient.toPounds();
-        assertEquals(expectedPounds, actualPounds, 1e-3);
+        assertDoubleFuzzyEquals(expectedPounds, actualPounds);
     }
 
     @ParameterizedTest
@@ -64,7 +64,7 @@ public class TestMass {
             Mass patient = Mass.fromGrams(grams);
 
             double gramsOut = patient.toGrams();
-            assertEquals(grams, gramsOut, 1e-3);
+            assertDoubleFuzzyEquals(grams, gramsOut);
         } catch (MagnitudeOutOfRangeException exception) {
             fail("Unexpected exception caught");
         }
@@ -106,7 +106,7 @@ public class TestMass {
             Mass patient = Mass.fromKilograms(kilograms);
 
             double kilosOut = patient.toKilograms();
-            assertEquals(kilograms, kilosOut, 1e-3);
+            assertDoubleFuzzyEquals(kilograms, kilosOut);
         } catch (MagnitudeOutOfRangeException exception) {
             fail("Unexpected exception caught");
         }
@@ -147,7 +147,7 @@ public class TestMass {
             Mass patient = Mass.fromPounds(pounds);
 
             double poundsOut = patient.toPounds();
-            assertEquals(pounds, poundsOut, 1e-3);
+            assertDoubleFuzzyEquals(pounds, poundsOut);
         } catch (MagnitudeOutOfRangeException exception) {
             fail("Unexpected exception caught");
         }
@@ -252,6 +252,10 @@ public class TestMass {
                 Arguments.of(randomMilligrams1, randomMilligrams2, massesNotEqual),
                 Arguments.of(randomMilligrams1, randomMilligrams1, massesEqual)
         );
+    }
+
+    private void assertDoubleFuzzyEquals(double expected, double actual) {
+        assertEquals(expected, actual, Math.abs(expected) * 1.0E-16);
     }
 
     private static long validRandomMilligrams() {
