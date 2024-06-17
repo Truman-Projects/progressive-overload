@@ -1,7 +1,6 @@
 package truman.progressiveoverload.randomUtilities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Set;
 
 public class RandomOther<Type> {
@@ -24,6 +23,8 @@ public class RandomOther<Type> {
     }
 
     public Type otherThan(Type other) {
-        return otherThan(new ArrayList<>(Arrays.asList(other)));
+        ArrayList<Type> arrayList = new ArrayList<>();
+        arrayList.add(other);
+        return otherThan(arrayList);
     }
 }
