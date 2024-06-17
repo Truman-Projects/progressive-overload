@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -31,43 +32,56 @@ import truman.progressiveoverload.randomUtilities.RandomOther;
 import truman.progressiveoverload.randomUtilities.RandomString;
 
 class TestGoalManager {
-    private static final RandomGoalData goalDataGen_ = new RandomGoalData();
 
     // intermediate interface to appease the mockito gods
     private interface I_FakeValueGoalListener extends I_GoalListener<FakeTimestampedValue> {
     }
 
+    private static final RandomGoalData goalDataGen_ = new RandomGoalData();
+    private I_FakeValueGoalListener[] listenerList_;
+    private GoalData<FakeTimestampedValue> initialGoalData_;
+    private GoalManager<FakeTimestampedValue> patient_;
+
+    @BeforeEach
+    public void resetEverything() {
+        listenerList_ = new I_FakeValueGoalListener[]{
+                mock(I_FakeValueGoalListener.class),
+                mock(I_FakeValueGoalListener.class)
+        };
+        initialGoalData_ = goalDataGen_.generate();
+        resetPatient();
+    }
+
+    private void resetPatient() {
+        patient_ = new GoalManager<>(initialGoalData_);
+    }
+
     @Test
     public void willProvideCorrectCurrentStateOnConstruction() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
 
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-
-        assertEquals(initialGoalData, patient.currentState());
+        assertEquals(initialGoalData_, patient_.currentState());
     }
 
     @Test
     public void willProvideUpdatedCurrentStateAfterChangingDescription() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        String newDescription = new RandomOther<>(new RandomString()).otherThan(initialGoalData.description());
-        GoalData<FakeTimestampedValue> goalDataWithNewDescription = initialGoalData.withDescription(newDescription);
+        String newDescription = new RandomOther<>(new RandomString()).otherThan(initialGoalData_.description());
+        GoalData<FakeTimestampedValue> goalDataWithNewDescription = initialGoalData_.withDescription(newDescription);
 
-        patient.changeGoalDescription(newDescription);
+        patient_.changeGoalDescription(newDescription);
 
-        assertEquals(goalDataWithNewDescription, patient.currentState());
+        assertEquals(goalDataWithNewDescription, patient_.currentState());
     }
 
     @ParameterizedTest
     @MethodSource("willProvideUpdatedCurrentStateAfterChangingGoalType_data")
     public void willProvideUpdatedCurrentStateAfterChangingGoalType(GoalType initialGoalType, GoalType newGoalType) {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withGoalType(initialGoalType);
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        GoalData<FakeTimestampedValue> goalDataWithNewGoalType = initialGoalData.withGoalType(newGoalType);
+        initialGoalData_ = initialGoalData_.withGoalType(initialGoalType);
+        resetPatient();
+        GoalData<FakeTimestampedValue> goalDataWithNewGoalType = initialGoalData_.withGoalType(newGoalType);
 
-        patient.changeGoalType(newGoalType);
+        patient_.changeGoalType(newGoalType);
 
-        assertEquals(goalDataWithNewGoalType, patient.currentState());
+        assertEquals(goalDataWithNewGoalType, patient_.currentState());
     }
 
     // returns (GoalType initialGoalType, GoalType newGoalType)
@@ -82,48 +96,44 @@ class TestGoalManager {
 
     @Test
     public void willProvideUpdatedCurrentStateAfterAddingRecord() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         FakeTimestampedValue newRecord = new RandomFakeTimestampedValue().generate();
-        HashMap<Long, FakeTimestampedValue> initialRecords = initialGoalData.recordsById();
+        HashMap<Long, FakeTimestampedValue> initialRecords = initialGoalData_.recordsById();
 
-        Long newRecordId = patient.addRecord(newRecord);
+        Long newRecordId = patient_.addRecord(newRecord);
 
         HashMap<Long, FakeTimestampedValue> expectedRecords = new HashMap<>(initialRecords);
         expectedRecords.put(newRecordId, newRecord);
-        GoalData<FakeTimestampedValue> goalDataWithExpectedRecords = initialGoalData.withRecordsById(expectedRecords);
-        assertEquals(goalDataWithExpectedRecords, patient.currentState());
+        GoalData<FakeTimestampedValue> goalDataWithExpectedRecords = initialGoalData_.withRecordsById(expectedRecords);
+        assertEquals(goalDataWithExpectedRecords, patient_.currentState());
     }
 
     @Test
     public void willProvideUpdatedCurrentStateAfterAddingMilestone() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         FakeTimestampedValue newMilestone = new RandomFakeTimestampedValue().generate();
-        HashMap<Long, FakeTimestampedValue> initialMilestones = initialGoalData.targetMilestonesById();
+        HashMap<Long, FakeTimestampedValue> initialMilestones = initialGoalData_.targetMilestonesById();
 
-        Long newMilestoneId = patient.addTargetMilestone(newMilestone);
+        Long newMilestoneId = patient_.addTargetMilestone(newMilestone);
 
         HashMap<Long, FakeTimestampedValue> expectedMilestones = new HashMap<>(initialMilestones);
         expectedMilestones.put(newMilestoneId, newMilestone);
-        GoalData<FakeTimestampedValue> goalDataWithExpectedMilestones = initialGoalData.withTargetMilestonesById(expectedMilestones);
-        assertEquals(goalDataWithExpectedMilestones, patient.currentState());
+        GoalData<FakeTimestampedValue> goalDataWithExpectedMilestones = initialGoalData_.withTargetMilestonesById(expectedMilestones);
+        assertEquals(goalDataWithExpectedMilestones, patient_.currentState());
     }
 
     @ParameterizedTest
     @MethodSource("idOrderingTestData")
     public void willGenerateRecordIdsInIncreasingOrder(HashMap<Long, FakeTimestampedValue> initialMap, int numberOfEntriesToAdd,
                                                        Set<Long> expectedIds) {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withRecordsById(initialMap);
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
+        initialGoalData_ = initialGoalData_.withRecordsById(initialMap);
+        resetPatient();
         RandomFakeTimestampedValue valueGenerator = new RandomFakeTimestampedValue();
 
         for (int recordsAdded = 0; recordsAdded < numberOfEntriesToAdd; recordsAdded++) {
             FakeTimestampedValue randomValue = valueGenerator.generate();
-            patient.addRecord(randomValue);
+            patient_.addRecord(randomValue);
         }
 
-        Set<Long> actualIds = patient.currentState().recordsById().keySet();
+        Set<Long> actualIds = patient_.currentState().recordsById().keySet();
         assertEquals(expectedIds, actualIds);
     }
 
@@ -131,223 +141,196 @@ class TestGoalManager {
     @MethodSource("idOrderingTestData")
     public void willGenerateMilestoneIdsInIncreasingOrder(HashMap<Long, FakeTimestampedValue> initialMap, int numberOfEntriesToAdd,
                                                           Set<Long> expectedIds) {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withTargetMilestonesById(initialMap);
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
+        initialGoalData_ = initialGoalData_.withTargetMilestonesById(initialMap);
+        resetPatient();
         RandomFakeTimestampedValue valueGenerator = new RandomFakeTimestampedValue();
 
         for (int milestonesAdded = 0; milestonesAdded < numberOfEntriesToAdd; milestonesAdded++) {
             FakeTimestampedValue randomValue = valueGenerator.generate();
-            patient.addTargetMilestone(randomValue);
+            patient_.addTargetMilestone(randomValue);
         }
 
-        Set<Long> actualIds = patient.currentState().targetMilestonesById().keySet();
+        Set<Long> actualIds = patient_.currentState().targetMilestonesById().keySet();
         assertEquals(expectedIds, actualIds);
     }
 
     @Test
     public void willProvideUpdatedCurrentStateAfterRemovingValidRecord() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        HashMap<Long, FakeTimestampedValue> initialRecords = initialGoalData.recordsById();
+        HashMap<Long, FakeTimestampedValue> initialRecords = initialGoalData_.recordsById();
         Long recordIdToRemove = pickRandomEntryIdFromMap(initialRecords);
 
         try {
-            patient.removeRecord(recordIdToRemove);
+            patient_.removeRecord(recordIdToRemove);
         } catch (InvalidQueryException ignore) {
         }
 
         HashMap<Long, FakeTimestampedValue> expectedRecords = new HashMap<>(initialRecords);
         expectedRecords.remove(recordIdToRemove);
-        GoalData<FakeTimestampedValue> goalDataWithExpectedRecords = initialGoalData.withRecordsById(expectedRecords);
-        assertEquals(goalDataWithExpectedRecords, patient.currentState());
+        GoalData<FakeTimestampedValue> goalDataWithExpectedRecords = initialGoalData_.withRecordsById(expectedRecords);
+        assertEquals(goalDataWithExpectedRecords, patient_.currentState());
     }
 
     @Test
     public void willProvideUpdatedCurrentStateAfterRemovingValidMilestone() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        HashMap<Long, FakeTimestampedValue> initialMilestones = initialGoalData.targetMilestonesById();
+        HashMap<Long, FakeTimestampedValue> initialMilestones = initialGoalData_.targetMilestonesById();
         Long milestoneIdToRemove = pickRandomEntryIdFromMap(initialMilestones);
 
         try {
-            patient.removeTargetMilestone(milestoneIdToRemove);
+            patient_.removeTargetMilestone(milestoneIdToRemove);
         } catch (InvalidQueryException ignore) {
         }
 
         HashMap<Long, FakeTimestampedValue> expectedMilestones = new HashMap<>(initialMilestones);
         expectedMilestones.remove(milestoneIdToRemove);
-        GoalData<FakeTimestampedValue> goalDataWithExpectedMilestones = initialGoalData.withTargetMilestonesById(expectedMilestones);
-        assertEquals(goalDataWithExpectedMilestones, patient.currentState());
+        GoalData<FakeTimestampedValue> goalDataWithExpectedMilestones = initialGoalData_.withTargetMilestonesById(expectedMilestones);
+        assertEquals(goalDataWithExpectedMilestones, patient_.currentState());
     }
 
     @Test
     public void willThrowExceptionWhenAttemptingToRemoveInvalidRecordId() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        Long invalidRecordId = pickRandomEntryIdNotInMap(initialGoalData.recordsById());
+        Long invalidRecordId = pickRandomEntryIdNotInMap(initialGoalData_.recordsById());
 
-        assertThrows(InvalidQueryException.class, () -> patient.removeRecord(invalidRecordId));
+        assertThrows(InvalidQueryException.class, () -> patient_.removeRecord(invalidRecordId));
     }
 
     @Test
     public void willThrowExceptionWhenAttemptingToRemoveInvalidMilestoneId() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        Long invalidMilestoneId = pickRandomEntryIdNotInMap(initialGoalData.recordsById());
+        Long invalidMilestoneId = pickRandomEntryIdNotInMap(initialGoalData_.recordsById());
 
-        assertThrows(InvalidQueryException.class, () -> patient.removeTargetMilestone(invalidMilestoneId));
+        assertThrows(InvalidQueryException.class, () -> patient_.removeTargetMilestone(invalidMilestoneId));
     }
 
     @Test
     public void willNotReuseRemovedRecordIds() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withRecordsById(new HashMap<>());
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
+        initialGoalData_ = initialGoalData_.withRecordsById(new HashMap<>());
+        resetPatient();
         RandomFakeTimestampedValue valueGen = new RandomFakeTimestampedValue();
-        Long firstRecordId = patient.addRecord(valueGen.generate());
+        Long firstRecordId = patient_.addRecord(valueGen.generate());
         try {
-            patient.removeRecord(firstRecordId);
+            patient_.removeRecord(firstRecordId);
         } catch (InvalidQueryException ignore) {
         }
 
-        Long secondRecordId = patient.addRecord(valueGen.generate());
+        Long secondRecordId = patient_.addRecord(valueGen.generate());
 
         assertNotEquals(firstRecordId, secondRecordId);
     }
 
     @Test
     public void willNotReuseRemovedMilestoneIds() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withTargetMilestonesById(new HashMap<>());
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
+        initialGoalData_ = initialGoalData_.withTargetMilestonesById(new HashMap<>());
+        resetPatient();
         RandomFakeTimestampedValue valueGen = new RandomFakeTimestampedValue();
-        Long firstMilestoneId = patient.addTargetMilestone(valueGen.generate());
+        Long firstMilestoneId = patient_.addTargetMilestone(valueGen.generate());
         try {
-            patient.removeTargetMilestone(firstMilestoneId);
+            patient_.removeTargetMilestone(firstMilestoneId);
         } catch (InvalidQueryException ignore) {
         }
 
-        Long secondMilestoneId = patient.addTargetMilestone(valueGen.generate());
+        Long secondMilestoneId = patient_.addTargetMilestone(valueGen.generate());
 
         assertNotEquals(firstMilestoneId, secondMilestoneId);
     }
 
     @Test
     public void willProvideCorrectCurrentStateAfterEditingRecord() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        HashMap<Long, FakeTimestampedValue> initialRecords = initialGoalData.recordsById();
+        HashMap<Long, FakeTimestampedValue> initialRecords = initialGoalData_.recordsById();
         Long recordIdToEdit = pickRandomEntryIdFromMap(initialRecords);
         FakeTimestampedValue recordAfterEditing =
                 new RandomOther<>(new RandomFakeTimestampedValue()).otherThan(new ArrayList<>(initialRecords.values()));
 
         try {
-            patient.editRecord(recordIdToEdit, recordAfterEditing);
+            patient_.editRecord(recordIdToEdit, recordAfterEditing);
         } catch (InvalidQueryException ignore) {
         }
 
-        assertEquals(recordAfterEditing, patient.currentState().recordsById().get(recordIdToEdit));
+        assertEquals(recordAfterEditing, patient_.currentState().recordsById().get(recordIdToEdit));
     }
 
     @Test
     public void willProvideCorrectCurrentStateAfterEditingMilestone() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        HashMap<Long, FakeTimestampedValue> initialMilestones = initialGoalData.targetMilestonesById();
+        HashMap<Long, FakeTimestampedValue> initialMilestones = initialGoalData_.targetMilestonesById();
         Long milestoneIdToEdit = pickRandomEntryIdFromMap(initialMilestones);
         FakeTimestampedValue milestoneAfterEditing =
                 new RandomOther<>(new RandomFakeTimestampedValue()).otherThan(new ArrayList<>(initialMilestones.values()));
 
         try {
-            patient.editTargetMilestone(milestoneIdToEdit, milestoneAfterEditing);
+            patient_.editTargetMilestone(milestoneIdToEdit, milestoneAfterEditing);
         } catch (InvalidQueryException ignore) {
         }
 
-        assertEquals(milestoneAfterEditing, patient.currentState().targetMilestonesById().get(milestoneIdToEdit));
+        assertEquals(milestoneAfterEditing, patient_.currentState().targetMilestonesById().get(milestoneIdToEdit));
     }
 
     @Test
     public void willThrowExceptionWhenAttemptingToEditInvalidRecordId() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        Long invalidRecordId = pickRandomEntryIdNotInMap(initialGoalData.recordsById());
+        Long invalidRecordId = pickRandomEntryIdNotInMap(initialGoalData_.recordsById());
         FakeTimestampedValue randomUpdatedRecord = new RandomFakeTimestampedValue().generate();
 
-        assertThrows(InvalidQueryException.class, () -> patient.editRecord(invalidRecordId, randomUpdatedRecord));
+        assertThrows(InvalidQueryException.class, () -> patient_.editRecord(invalidRecordId, randomUpdatedRecord));
     }
 
     @Test
     public void willThrowExceptionWhenAttemptingToEditInvalidMilestoneId() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        Long invalidMilestoneId = pickRandomEntryIdNotInMap(initialGoalData.targetMilestonesById());
+        Long invalidMilestoneId = pickRandomEntryIdNotInMap(initialGoalData_.targetMilestonesById());
         FakeTimestampedValue randomUpdatedMilestone = new RandomFakeTimestampedValue().generate();
 
-        assertThrows(InvalidQueryException.class, () -> patient.editTargetMilestone(invalidMilestoneId, randomUpdatedMilestone));
+        assertThrows(InvalidQueryException.class, () -> patient_.editTargetMilestone(invalidMilestoneId, randomUpdatedMilestone));
     }
 
     @Test
     public void willDoNothingIfListenerRegisteredTwice() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalListener mockListener = mock(I_FakeValueGoalListener.class);
-        patient.registerListener(mockListener);
+        patient_.registerListener(listenerList_[0]);
         String updatedDescription = new RandomString().generate();
 
         // register the same listener again
-        patient.registerListener(mockListener);
+        patient_.registerListener(listenerList_[0]);
         // we are only testing changeGoalDescription() as it would be impractical to test this for every single changed signal
-        patient.changeGoalDescription(updatedDescription);
+        patient_.changeGoalDescription(updatedDescription);
 
-        verify(mockListener, times(1)).goalDescriptionChanged(updatedDescription);
+        verify(listenerList_[0], times(1)).goalDescriptionChanged(updatedDescription);
     }
 
     @Test
     public void willNotNotifyUnregisteredListener() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalListener mockListener = mock(I_FakeValueGoalListener.class);
-        patient.registerListener(mockListener);
+        patient_.registerListener(listenerList_[0]);
         String updatedDescription = new RandomString().generate();
-        patient.changeGoalDescription(updatedDescription);
+        patient_.changeGoalDescription(updatedDescription);
 
-        patient.unregisterListener(mockListener);
+        patient_.unregisterListener(listenerList_[0]);
         // we are only testing changeGoalDescription() as it would be impractical to test this for every single changed signal
-        patient.changeGoalDescription(updatedDescription);
+        patient_.changeGoalDescription(updatedDescription);
 
-        verify(mockListener, times(1)).goalDescriptionChanged(updatedDescription);
+        verify(listenerList_[0], times(1)).goalDescriptionChanged(updatedDescription);
     }
 
     @Test
     public void willDoNothingWhenUnregisteringUnknownListener() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalListener mockListener = mock(I_FakeValueGoalListener.class);
-        patient.registerListener(mockListener);
+        patient_.registerListener(listenerList_[0]);
         String updatedDescription = new RandomString().generate();
-        I_FakeValueGoalListener unknownListener = mock(I_FakeValueGoalListener.class);
 
 
-        patient.unregisterListener(unknownListener);
+        // this listener was never registered
+        patient_.unregisterListener(listenerList_[1]);
         // we are only testing changeGoalDescription() as it would be impractical to test this for every single changed signal
-        patient.changeGoalDescription(updatedDescription);
+        patient_.changeGoalDescription(updatedDescription);
 
-        verify(mockListener, times(1)).goalDescriptionChanged(updatedDescription);
+        verify(listenerList_[0], times(1)).goalDescriptionChanged(updatedDescription);
     }
 
     @ParameterizedTest
     @MethodSource("willNotifyListenersWhenDescriptionChanged_data")
     public void willNotifyListenersWhenDescriptionChanged(String initialDescription, String updatedDescription,
                                                           int timesDescriptionChanged) {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withDescription(initialDescription);
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
-        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
-        patient.registerListener(mockListener1);
-        patient.registerListener(mockListener2);
+        initialGoalData_ = initialGoalData_.withDescription(initialDescription);
+        resetPatient();
+        patient_.registerListener(listenerList_[0]);
+        patient_.registerListener(listenerList_[1]);
 
-        patient.changeGoalDescription(updatedDescription);
+        patient_.changeGoalDescription(updatedDescription);
 
-        verify(mockListener1, times(timesDescriptionChanged)).goalDescriptionChanged(updatedDescription);
-        verify(mockListener2, times(timesDescriptionChanged)).goalDescriptionChanged(updatedDescription);
+        verify(listenerList_[0], times(timesDescriptionChanged)).goalDescriptionChanged(updatedDescription);
+        verify(listenerList_[1], times(timesDescriptionChanged)).goalDescriptionChanged(updatedDescription);
     }
 
     // returns (String initialDescription, String updatedDescription, int timesDescriptionChanged)
@@ -366,17 +349,15 @@ class TestGoalManager {
     @ParameterizedTest
     @MethodSource("willNotifyListenersWhenGoalTypeChanged_data")
     public void willNotifyListenersWhenGoalTypeChanged(GoalType initialGoalType, GoalType updatedGoalType, int timesGoalTypeChanged) {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withGoalType(initialGoalType);
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
-        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
-        patient.registerListener(mockListener1);
-        patient.registerListener(mockListener2);
+        initialGoalData_ = initialGoalData_.withGoalType(initialGoalType);
+        resetPatient();
+        patient_.registerListener(listenerList_[0]);
+        patient_.registerListener(listenerList_[1]);
 
-        patient.changeGoalType(updatedGoalType);
+        patient_.changeGoalType(updatedGoalType);
 
-        verify(mockListener1, times(timesGoalTypeChanged)).goalTypeChanged(updatedGoalType);
-        verify(mockListener2, times(timesGoalTypeChanged)).goalTypeChanged(updatedGoalType);
+        verify(listenerList_[0], times(timesGoalTypeChanged)).goalTypeChanged(updatedGoalType);
+        verify(listenerList_[1], times(timesGoalTypeChanged)).goalTypeChanged(updatedGoalType);
     }
 
     // returns (GoalType initialGoalType, GoalType updatedGoalType, int timesGoalTypeChanged)
@@ -391,54 +372,44 @@ class TestGoalManager {
 
     @Test
     public void willNotifyListenersWhenRecordAdded() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         FakeTimestampedValue newRecord = new RandomFakeTimestampedValue().generate();
-        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
-        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
-        patient.registerListener(mockListener1);
-        patient.registerListener(mockListener2);
+        patient_.registerListener(listenerList_[0]);
+        patient_.registerListener(listenerList_[1]);
 
-        Long newRecordId = patient.addRecord(newRecord);
+        Long newRecordId = patient_.addRecord(newRecord);
 
-        verify(mockListener1, times(1)).recordAdded(newRecordId, newRecord);
-        verify(mockListener2, times(1)).recordAdded(newRecordId, newRecord);
+        verify(listenerList_[0], times(1)).recordAdded(newRecordId, newRecord);
+        verify(listenerList_[1], times(1)).recordAdded(newRecordId, newRecord);
     }
 
     @Test
     public void willNotifyListenersWhenMilestoneAdded() {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         FakeTimestampedValue newMilestone = new RandomFakeTimestampedValue().generate();
-        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
-        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
-        patient.registerListener(mockListener1);
-        patient.registerListener(mockListener2);
+        patient_.registerListener(listenerList_[0]);
+        patient_.registerListener(listenerList_[1]);
 
-        Long newMilestoneId = patient.addTargetMilestone(newMilestone);
+        Long newMilestoneId = patient_.addTargetMilestone(newMilestone);
 
-        verify(mockListener1, times(1)).targetMilestoneAdded(newMilestoneId, newMilestone);
-        verify(mockListener2, times(1)).targetMilestoneAdded(newMilestoneId, newMilestone);
+        verify(listenerList_[0], times(1)).targetMilestoneAdded(newMilestoneId, newMilestone);
+        verify(listenerList_[1], times(1)).targetMilestoneAdded(newMilestoneId, newMilestone);
     }
 
     @ParameterizedTest
     @MethodSource("validAndInvalidHashMapIds")
     public void willNotifyListenersWhenRecordRemoved(HashMap<Long, FakeTimestampedValue> initialRecords, Long potentiallyInvalidRecordId,
                                                      boolean idIsValid) {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withRecordsById(initialRecords);
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
-        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
-        patient.registerListener(mockListener1);
-        patient.registerListener(mockListener2);
+        initialGoalData_ = initialGoalData_.withRecordsById(initialRecords);
+        resetPatient();
+        patient_.registerListener(listenerList_[0]);
+        patient_.registerListener(listenerList_[1]);
 
         try {
-            patient.removeRecord(potentiallyInvalidRecordId);
+            patient_.removeRecord(potentiallyInvalidRecordId);
         } catch (InvalidQueryException ignore) {
         }
 
-        verify(mockListener1, times(idIsValid ? 1 : 0)).recordRemoved(potentiallyInvalidRecordId);
-        verify(mockListener2, times(idIsValid ? 1 : 0)).recordRemoved(potentiallyInvalidRecordId);
+        verify(listenerList_[0], times(idIsValid ? 1 : 0)).recordRemoved(potentiallyInvalidRecordId);
+        verify(listenerList_[1], times(idIsValid ? 1 : 0)).recordRemoved(potentiallyInvalidRecordId);
     }
 
     @ParameterizedTest
@@ -446,41 +417,37 @@ class TestGoalManager {
     public void willNotifyListenersWhenMilestoneRemoved(HashMap<Long, FakeTimestampedValue> initialMilestones,
                                                         Long potentiallyInvalidMilestoneId,
                                                         boolean idIsValid) {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withTargetMilestonesById(initialMilestones);
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
-        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
-        patient.registerListener(mockListener1);
-        patient.registerListener(mockListener2);
+        initialGoalData_ = initialGoalData_.withTargetMilestonesById(initialMilestones);
+        resetPatient();
+        patient_.registerListener(listenerList_[0]);
+        patient_.registerListener(listenerList_[1]);
 
         try {
-            patient.removeTargetMilestone(potentiallyInvalidMilestoneId);
+            patient_.removeTargetMilestone(potentiallyInvalidMilestoneId);
         } catch (InvalidQueryException ignore) {
         }
 
-        verify(mockListener1, times(idIsValid ? 1 : 0)).targetMilestoneRemoved(potentiallyInvalidMilestoneId);
-        verify(mockListener2, times(idIsValid ? 1 : 0)).targetMilestoneRemoved(potentiallyInvalidMilestoneId);
+        verify(listenerList_[0], times(idIsValid ? 1 : 0)).targetMilestoneRemoved(potentiallyInvalidMilestoneId);
+        verify(listenerList_[1], times(idIsValid ? 1 : 0)).targetMilestoneRemoved(potentiallyInvalidMilestoneId);
     }
 
     @ParameterizedTest
     @MethodSource("validAndInvalidHashMapIds")
     public void willNotifyListenersWhenRecordChanged(HashMap<Long, FakeTimestampedValue> initialRecords, Long potentiallyInvalidRecordId,
                                                      boolean idIsValid) {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withRecordsById(initialRecords);
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
+        initialGoalData_ = initialGoalData_.withRecordsById(initialRecords);
+        resetPatient();
         FakeTimestampedValue updatedRecord = new RandomFakeTimestampedValue().generate();
-        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
-        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
-        patient.registerListener(mockListener1);
-        patient.registerListener(mockListener2);
+        patient_.registerListener(listenerList_[0]);
+        patient_.registerListener(listenerList_[1]);
 
         try {
-            patient.editRecord(potentiallyInvalidRecordId, updatedRecord);
+            patient_.editRecord(potentiallyInvalidRecordId, updatedRecord);
         } catch (InvalidQueryException ignore) {
         }
 
-        verify(mockListener1, times(idIsValid ? 1 : 0)).recordChanged(potentiallyInvalidRecordId, updatedRecord);
-        verify(mockListener2, times(idIsValid ? 1 : 0)).recordChanged(potentiallyInvalidRecordId, updatedRecord);
+        verify(listenerList_[0], times(idIsValid ? 1 : 0)).recordChanged(potentiallyInvalidRecordId, updatedRecord);
+        verify(listenerList_[1], times(idIsValid ? 1 : 0)).recordChanged(potentiallyInvalidRecordId, updatedRecord);
     }
 
     @ParameterizedTest
@@ -488,21 +455,19 @@ class TestGoalManager {
     public void willNotifyListenersWhenMilestoneChanged(HashMap<Long, FakeTimestampedValue> initialMilestones,
                                                         Long potentiallyInvalidMilestoneId,
                                                         boolean idIsValid) {
-        GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withTargetMilestonesById(initialMilestones);
-        GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
+        initialGoalData_ = initialGoalData_.withTargetMilestonesById(initialMilestones);
+        resetPatient();
         FakeTimestampedValue updatedMilestone = new RandomFakeTimestampedValue().generate();
-        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
-        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
-        patient.registerListener(mockListener1);
-        patient.registerListener(mockListener2);
+        patient_.registerListener(listenerList_[0]);
+        patient_.registerListener(listenerList_[1]);
 
         try {
-            patient.editTargetMilestone(potentiallyInvalidMilestoneId, updatedMilestone);
+            patient_.editTargetMilestone(potentiallyInvalidMilestoneId, updatedMilestone);
         } catch (InvalidQueryException ignore) {
         }
 
-        verify(mockListener1, times(idIsValid ? 1 : 0)).targetMilestoneChanged(potentiallyInvalidMilestoneId, updatedMilestone);
-        verify(mockListener2, times(idIsValid ? 1 : 0)).targetMilestoneChanged(potentiallyInvalidMilestoneId, updatedMilestone);
+        verify(listenerList_[0], times(idIsValid ? 1 : 0)).targetMilestoneChanged(potentiallyInvalidMilestoneId, updatedMilestone);
+        verify(listenerList_[1], times(idIsValid ? 1 : 0)).targetMilestoneChanged(potentiallyInvalidMilestoneId, updatedMilestone);
     }
 
     // returns (HashMap<Long,FakeTimestampedValue> map, Long id, boolean idIsValid)
