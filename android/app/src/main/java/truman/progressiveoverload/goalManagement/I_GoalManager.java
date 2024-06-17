@@ -2,20 +2,20 @@ package truman.progressiveoverload.goalManagement;
 
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.GoalType;
-import truman.progressiveoverload.goalManagement.api.I_GoalUpdateListener;
-import truman.progressiveoverload.goalManagement.api.I_GoalUpdateNotifier;
+import truman.progressiveoverload.goalManagement.api.I_GoalListener;
+import truman.progressiveoverload.goalManagement.api.I_GoalNotifier;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 
-interface I_GoalManager<TimestampedType extends I_TimestampedValue> extends I_GoalUpdateNotifier<TimestampedType>,
+interface I_GoalManager<TimestampedType extends I_TimestampedValue> extends I_GoalNotifier<TimestampedType>,
         I_GoalUpdater<TimestampedType> {
     // I_GoalUpdateNotifier
     @Override
-    void registerListener(I_GoalUpdateListener<TimestampedType> listener);
+    void registerListener(I_GoalListener<TimestampedType> listener);
 
     @Override
-    void unregisterListener(I_GoalUpdateListener<TimestampedType> listener);
+    void unregisterListener(I_GoalListener<TimestampedType> listener);
 
     @Override
     GoalData<TimestampedType> currentState();

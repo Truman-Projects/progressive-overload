@@ -7,7 +7,7 @@ import java.util.Set;
 
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.GoalType;
-import truman.progressiveoverload.goalManagement.api.I_GoalUpdateListener;
+import truman.progressiveoverload.goalManagement.api.I_GoalListener;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 
@@ -15,7 +15,7 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
     private GoalData<TimestampedType> goalData_;
     private Long largestRecordId_;
     private Long largestMilestoneId_;
-    private final HashSet<I_GoalUpdateListener<TimestampedType>> listeners_;
+    private final HashSet<I_GoalListener<TimestampedType>> listeners_;
 
     public GoalManager(GoalData<TimestampedType> data) {
         goalData_ = data;
@@ -31,12 +31,12 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
 
     // I_GoalUpdateNotifier
     @Override
-    public void registerListener(I_GoalUpdateListener<TimestampedType> listener) {
+    public void registerListener(I_GoalListener<TimestampedType> listener) {
         listeners_.add(listener);
     }
 
     @Override
-    public void unregisterListener(I_GoalUpdateListener<TimestampedType> listener) {
+    public void unregisterListener(I_GoalListener<TimestampedType> listener) {
         listeners_.remove(listener);
     }
 
@@ -145,11 +145,11 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
     }
 
     private interface NotifyListenersLambda<T extends I_TimestampedValue> {
-        void notify(I_GoalUpdateListener<T> listener);
+        void notify(I_GoalListener<T> listener);
     }
 
     private void notifyAllListeners(NotifyListenersLambda<TimestampedType> notifyFunction) {
-        for (I_GoalUpdateListener<TimestampedType> listener : listeners_) {
+        for (I_GoalListener<TimestampedType> listener : listeners_) {
             notifyFunction.notify(listener);
         }
     }

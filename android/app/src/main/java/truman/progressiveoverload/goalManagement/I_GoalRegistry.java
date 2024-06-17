@@ -4,28 +4,28 @@ import java.util.HashSet;
 
 import truman.progressiveoverload.goalManagement.api.DuplicateEntryException;
 import truman.progressiveoverload.goalManagement.api.GoalData;
-import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdateListener;
-import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdateSource;
+import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
+import truman.progressiveoverload.goalManagement.api.I_GoalRegistryNotifier;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdater;
-import truman.progressiveoverload.goalManagement.api.I_GoalUpdateNotifier;
+import truman.progressiveoverload.goalManagement.api.I_GoalNotifier;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 
-interface I_GoalRegistry<TimestampedType extends I_TimestampedValue> extends I_GoalRegistryUpdateSource<TimestampedType>,
+interface I_GoalRegistry<TimestampedType extends I_TimestampedValue> extends I_GoalRegistryNotifier<TimestampedType>,
         I_GoalRegistryUpdater<TimestampedType> {
     // I_GoalRegistryUpdateSource
     @Override
-    void registerListener(I_GoalRegistryUpdateListener<TimestampedType> listener);
+    void registerListener(I_GoalRegistryListener<TimestampedType> listener);
 
     @Override
-    void unregisterListener(I_GoalRegistryUpdateListener<TimestampedType> listener);
+    void unregisterListener(I_GoalRegistryListener<TimestampedType> listener);
 
     @Override
     HashSet<String> currentGoalNames();
 
     @Override
-    I_GoalUpdateNotifier<TimestampedType> goalUpdateNotifierByName(String goalName) throws InvalidQueryException;
+    I_GoalNotifier<TimestampedType> goalUpdateNotifierByName(String goalName) throws InvalidQueryException;
 
     // I_GoalRegistryUpdater
     @Override

@@ -5,8 +5,8 @@ import java.util.HashSet;
 
 import truman.progressiveoverload.goalManagement.api.DuplicateEntryException;
 import truman.progressiveoverload.goalManagement.api.GoalData;
-import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdateListener;
-import truman.progressiveoverload.goalManagement.api.I_GoalUpdateNotifier;
+import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
+import truman.progressiveoverload.goalManagement.api.I_GoalNotifier;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.measurement.I_TimestampedValue;
@@ -14,7 +14,7 @@ import truman.progressiveoverload.measurement.I_TimestampedValue;
 class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_GoalRegistry<TimestampedType> {
     private final I_GoalManagerFactory<TimestampedType> goalManagerFactory_;
     private final HashMap<String, I_GoalManager<TimestampedType>> goalManagersByGoalNames_;
-    private final HashSet<I_GoalRegistryUpdateListener<TimestampedType>> listeners_;
+    private final HashSet<I_GoalRegistryListener<TimestampedType>> listeners_;
 
     public GoalRegistry(
             I_GoalManagerFactory<TimestampedType> goalManagerFactory) {
@@ -24,12 +24,12 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
     }
 
     @Override
-    public void registerListener(I_GoalRegistryUpdateListener<TimestampedType> listener) {
+    public void registerListener(I_GoalRegistryListener<TimestampedType> listener) {
         listeners_.add(listener);
     }
 
     @Override
-    public void unregisterListener(I_GoalRegistryUpdateListener<TimestampedType> listener) {
+    public void unregisterListener(I_GoalRegistryListener<TimestampedType> listener) {
         listeners_.remove(listener);
     }
 
@@ -39,7 +39,7 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
     }
 
     @Override
-    public I_GoalUpdateNotifier<TimestampedType> goalUpdateNotifierByName(String goalName) throws InvalidQueryException {
+    public I_GoalNotifier<TimestampedType> goalUpdateNotifierByName(String goalName) throws InvalidQueryException {
         if (!goalManagersByGoalNames_.containsKey(goalName)) {
             throw new InvalidQueryException("No goal update notifier with matching goal name");
         }
@@ -62,7 +62,7 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
             throw new DuplicateEntryException("Attempting to add goal with existing goal name");
         }
         goalManagersByGoalNames_.put(goalName, goalManagerFactory_.createGoalManager(goalData));
-        for (I_GoalRegistryUpdateListener<TimestampedType> listener : listeners_) {
+        for (I_GoalRegistryListener<TimestampedType> listener : listeners_) {
             listener.goalAdded(goalName);
         }
     }
@@ -73,7 +73,7 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
             throw new InvalidQueryException("Attempting to remove non-existent goal name");
         }
         goalManagersByGoalNames_.remove(goalName);
-        for (I_GoalRegistryUpdateListener<TimestampedType> listener : listeners_) {
+        for (I_GoalRegistryListener<TimestampedType> listener : listeners_) {
             listener.goalRemoved(goalName);
         }
     }

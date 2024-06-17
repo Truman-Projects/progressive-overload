@@ -14,8 +14,8 @@ import java.util.HashSet;
 
 import truman.progressiveoverload.goalManagement.api.DuplicateEntryException;
 import truman.progressiveoverload.goalManagement.api.GoalData;
-import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdateListener;
-import truman.progressiveoverload.goalManagement.api.I_GoalUpdateNotifier;
+import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
+import truman.progressiveoverload.goalManagement.api.I_GoalNotifier;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
@@ -34,19 +34,19 @@ class TestGoalRegistry {
     private interface I_FakeValueGoalManager extends I_GoalManager<FakeTimestampedValue> {
     }
 
-    private interface I_FakeGoalRegistryUpdateListener extends I_GoalRegistryUpdateListener<FakeTimestampedValue> {
+    private interface I_FakeGoalRegistryListener extends I_GoalRegistryListener<FakeTimestampedValue> {
     }
 
     private final RandomGoalData randomGoalDataGenerator_ = new RandomGoalData();
-    private I_FakeGoalRegistryUpdateListener[] listenerList_;
+    private I_FakeGoalRegistryListener[] listenerList_;
     private I_FakeValueGoalManagerFactory goalManagerFactory_;
     private GoalRegistry<FakeTimestampedValue> patient_;
 
     @BeforeEach
     public void resetEverything() {
-        listenerList_ = new I_FakeGoalRegistryUpdateListener[]{
-                mock(I_FakeGoalRegistryUpdateListener.class),
-                mock(I_FakeGoalRegistryUpdateListener.class)};
+        listenerList_ = new I_FakeGoalRegistryListener[]{
+                mock(I_FakeGoalRegistryListener.class),
+                mock(I_FakeGoalRegistryListener.class)};
         goalManagerFactory_ = mock(I_FakeValueGoalManagerFactory.class);
         patient_ = new GoalRegistry<>(goalManagerFactory_);
     }
@@ -127,7 +127,7 @@ class TestGoalRegistry {
         failOnException(() -> patient_.addGoal(randomGoalData));
 
         try {
-            I_GoalUpdateNotifier<FakeTimestampedValue> retrievedUpdateNotifier = patient_.goalUpdateNotifierByName(randomGoalData.name());
+            I_GoalNotifier<FakeTimestampedValue> retrievedUpdateNotifier = patient_.goalUpdateNotifierByName(randomGoalData.name());
             assertSame(mockGoalManager, retrievedUpdateNotifier);
         } catch (InvalidQueryException e) {
             fail("Caught unexpected exception");

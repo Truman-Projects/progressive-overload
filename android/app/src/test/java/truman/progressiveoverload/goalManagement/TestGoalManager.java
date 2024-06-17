@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.GoalType;
-import truman.progressiveoverload.goalManagement.api.I_GoalUpdateListener;
+import truman.progressiveoverload.goalManagement.api.I_GoalListener;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
 import truman.progressiveoverload.measurement.FakeTimestampedValue;
@@ -34,7 +34,7 @@ class TestGoalManager {
     private static final RandomGoalData goalDataGen_ = new RandomGoalData();
 
     // intermediate interface to appease the mockito gods
-    private interface I_FakeValueGoalUpdateListener extends I_GoalUpdateListener<FakeTimestampedValue> {
+    private interface I_FakeValueGoalListener extends I_GoalListener<FakeTimestampedValue> {
     }
 
     @Test
@@ -288,7 +288,7 @@ class TestGoalManager {
     public void willDoNothingIfListenerRegisteredTwice() {
         GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalUpdateListener mockListener = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener mockListener = mock(I_FakeValueGoalListener.class);
         patient.registerListener(mockListener);
         String updatedDescription = new RandomString().generate();
 
@@ -304,7 +304,7 @@ class TestGoalManager {
     public void willNotNotifyUnregisteredListener() {
         GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalUpdateListener mockListener = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener mockListener = mock(I_FakeValueGoalListener.class);
         patient.registerListener(mockListener);
         String updatedDescription = new RandomString().generate();
         patient.changeGoalDescription(updatedDescription);
@@ -320,10 +320,10 @@ class TestGoalManager {
     public void willDoNothingWhenUnregisteringUnknownListener() {
         GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalUpdateListener mockListener = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener mockListener = mock(I_FakeValueGoalListener.class);
         patient.registerListener(mockListener);
         String updatedDescription = new RandomString().generate();
-        I_FakeValueGoalUpdateListener unknownListener = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener unknownListener = mock(I_FakeValueGoalListener.class);
 
 
         patient.unregisterListener(unknownListener);
@@ -339,8 +339,8 @@ class TestGoalManager {
                                                           int timesDescriptionChanged) {
         GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withDescription(initialDescription);
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalUpdateListener mockListener1 = mock(I_FakeValueGoalUpdateListener.class);
-        I_FakeValueGoalUpdateListener mockListener2 = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
+        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
         patient.registerListener(mockListener1);
         patient.registerListener(mockListener2);
 
@@ -368,8 +368,8 @@ class TestGoalManager {
     public void willNotifyListenersWhenGoalTypeChanged(GoalType initialGoalType, GoalType updatedGoalType, int timesGoalTypeChanged) {
         GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withGoalType(initialGoalType);
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalUpdateListener mockListener1 = mock(I_FakeValueGoalUpdateListener.class);
-        I_FakeValueGoalUpdateListener mockListener2 = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
+        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
         patient.registerListener(mockListener1);
         patient.registerListener(mockListener2);
 
@@ -394,8 +394,8 @@ class TestGoalManager {
         GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         FakeTimestampedValue newRecord = new RandomFakeTimestampedValue().generate();
-        I_FakeValueGoalUpdateListener mockListener1 = mock(I_FakeValueGoalUpdateListener.class);
-        I_FakeValueGoalUpdateListener mockListener2 = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
+        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
         patient.registerListener(mockListener1);
         patient.registerListener(mockListener2);
 
@@ -410,8 +410,8 @@ class TestGoalManager {
         GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate();
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         FakeTimestampedValue newMilestone = new RandomFakeTimestampedValue().generate();
-        I_FakeValueGoalUpdateListener mockListener1 = mock(I_FakeValueGoalUpdateListener.class);
-        I_FakeValueGoalUpdateListener mockListener2 = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
+        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
         patient.registerListener(mockListener1);
         patient.registerListener(mockListener2);
 
@@ -427,8 +427,8 @@ class TestGoalManager {
                                                      boolean idIsValid) {
         GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withRecordsById(initialRecords);
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalUpdateListener mockListener1 = mock(I_FakeValueGoalUpdateListener.class);
-        I_FakeValueGoalUpdateListener mockListener2 = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
+        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
         patient.registerListener(mockListener1);
         patient.registerListener(mockListener2);
 
@@ -448,8 +448,8 @@ class TestGoalManager {
                                                         boolean idIsValid) {
         GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withTargetMilestonesById(initialMilestones);
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
-        I_FakeValueGoalUpdateListener mockListener1 = mock(I_FakeValueGoalUpdateListener.class);
-        I_FakeValueGoalUpdateListener mockListener2 = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
+        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
         patient.registerListener(mockListener1);
         patient.registerListener(mockListener2);
 
@@ -469,8 +469,8 @@ class TestGoalManager {
         GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withRecordsById(initialRecords);
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         FakeTimestampedValue updatedRecord = new RandomFakeTimestampedValue().generate();
-        I_FakeValueGoalUpdateListener mockListener1 = mock(I_FakeValueGoalUpdateListener.class);
-        I_FakeValueGoalUpdateListener mockListener2 = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
+        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
         patient.registerListener(mockListener1);
         patient.registerListener(mockListener2);
 
@@ -491,8 +491,8 @@ class TestGoalManager {
         GoalData<FakeTimestampedValue> initialGoalData = goalDataGen_.generate().withTargetMilestonesById(initialMilestones);
         GoalManager<FakeTimestampedValue> patient = new GoalManager<>(initialGoalData);
         FakeTimestampedValue updatedMilestone = new RandomFakeTimestampedValue().generate();
-        I_FakeValueGoalUpdateListener mockListener1 = mock(I_FakeValueGoalUpdateListener.class);
-        I_FakeValueGoalUpdateListener mockListener2 = mock(I_FakeValueGoalUpdateListener.class);
+        I_FakeValueGoalListener mockListener1 = mock(I_FakeValueGoalListener.class);
+        I_FakeValueGoalListener mockListener2 = mock(I_FakeValueGoalListener.class);
         patient.registerListener(mockListener1);
         patient.registerListener(mockListener2);
 
