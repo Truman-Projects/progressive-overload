@@ -17,12 +17,18 @@ import truman.progressiveoverload.randomUtilities.RandomLong;
 
 class TestDistance {
     final static double DOUBLE_PRECISION_AS_FRACTION = 1.0e-15; // ~15.9 decimal places, rounded for safety
+    final static double SLIGHTLY_MORE_THAN_ONE = 1.0 + DOUBLE_PRECISION_AS_FRACTION;
+    final static double SLIGHTLY_LESS_THAN_ONE = 1.0 - DOUBLE_PRECISION_AS_FRACTION;
     private long patientInCentimeters_;
     private Distance patient_;
 
     @BeforeEach
     public void resetEverything() {
         patientInCentimeters_ = validRandomCentimeters();
+        resetPatient();
+    }
+
+    private void resetPatient() {
         patient_ = new Distance(patientInCentimeters_);
     }
 
@@ -214,6 +220,108 @@ class TestDistance {
     }
 
     @ParameterizedTest
+    @MethodSource("canMultiplyByScalarWithinRange_data")
+    public void canMultiplyByScalarWithinRange(long initialCentimeters) {
+        patientInCentimeters_ = initialCentimeters;
+        resetPatient();
+        double maximumMultiplierBeforeOverload = calculateCurrentFactorAwayFromOverflow();
+        double minimumMultiplierBeforeOverload = -1.0 * maximumMultiplierBeforeOverload;
+        double randomValidMultiplier = new RandomDouble().generate(minimumMultiplierBeforeOverload, maximumMultiplierBeforeOverload);
+        long expectedCentimetersAfterMultiplication = (long) ((double) patientInCentimeters_ * randomValidMultiplier);
+
+        failOnException(() -> {
+            Distance distanceAfterMultiplication = patient_.multiplyByScalar(randomValidMultiplier);
+
+            assertEquals(expectedCentimetersAfterMultiplication, distanceAfterMultiplication.toCentimeters(), 1);
+        });
+    }
+
+    // returns (long initialCentimeters)
+    private static Stream<Arguments> canMultiplyByScalarWithinRange_data() {
+        long randomPositiveCentimeters = new RandomLong().generate(0L, Long.MAX_VALUE);
+        long randomNegativeCentimeters = -1L * randomPositiveCentimeters;
+        return Stream.of(
+                Arguments.of(randomPositiveCentimeters),
+                Arguments.of(randomNegativeCentimeters)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("willThrowExceptionAttemptingToMultiplyByScalarOutOfRange_data")
+    public void willThrowExceptionAttemptingToMultiplyByScalarOutOfRange(long initialCentimeters, double invalidMultiplier) {
+        patientInCentimeters_ = initialCentimeters;
+        resetPatient();
+        assertThrows(MagnitudeOutOfRangeException.class, () -> patient_.multiplyByScalar(invalidMultiplier));
+    }
+
+    // returns (long initialCentimeters, double invalidMultiplier)
+    private static Stream<Arguments> willThrowExceptionAttemptingToMultiplyByScalarOutOfRange_data() {
+        long initialCentimeters = new RandomLong().generate();
+        double factorAwayFromOverflow = (double) Distance.MAX_VALUE_CENTIMETERS / (double) initialCentimeters;
+        double multiplierToCauseOverflow = factorAwayFromOverflow * SLIGHTLY_MORE_THAN_ONE;
+
+        return Stream.of(
+                Arguments.of(initialCentimeters, multiplierToCauseOverflow),
+                Arguments.of(initialCentimeters, (-1) * multiplierToCauseOverflow)
+        );
+    }
+
+    @Test
+    public void canDivideByScalarWithinRange() {
+        double randomValidDivisor = randomDivisorThatWillNotCauseOverflow();
+        long expectedCentimetersAfterDivision = (long) ((double) patientInCentimeters_ / randomValidDivisor);
+
+        failOnException(() -> {
+            Distance distanceAfterDivision = patient_.divideByScalar(randomValidDivisor);
+
+            assertEquals(expectedCentimetersAfterDivision, distanceAfterDivision.toCentimeters(), 1);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("willThrowExceptionInsteadOfOverflowingDuringDivision_data")
+    public void willThrowExceptionAttemptingToDivideByScalarOutOfRange(long initialCentimeters, double invalidDivisor) {
+        patientInCentimeters_ = initialCentimeters;
+        resetPatient();
+        assertThrows(MagnitudeOutOfRangeException.class, () -> patient_.divideByScalar(invalidDivisor));
+    }
+
+
+    @Test
+    public void canDivideByValidDistance() {
+        long randomValidDivisor = (long) Math.ceil(randomDivisorThatWillNotCauseOverflow());
+        double expectedQuotient = ((double) patientInCentimeters_ / randomValidDivisor);
+        Distance divisor = new Distance(randomValidDivisor);
+        failOnException(() -> {
+            double actualQuotient = patient_.divideByDistance(divisor);
+
+            assertEquals(expectedQuotient, actualQuotient);
+        });
+    }
+
+    @ParameterizedTest
+    @MethodSource("willThrowExceptionInsteadOfOverflowingDuringDivision_data")
+    public void willThrowExceptionAttemptingToDivideByInvalidDistance(long initialCentimeters, double invalidDivisor) {
+        patientInCentimeters_ = initialCentimeters;
+        resetPatient();
+        Distance divisor = new Distance((long) invalidDivisor);
+        assertThrows(MagnitudeOutOfRangeException.class, () -> patient_.divideByDistance(divisor));
+    }
+
+    // returns (long initialCentimeters, double invalidDivisor)
+    private static Stream<Arguments> willThrowExceptionInsteadOfOverflowingDuringDivision_data() {
+        long initialCentimeters = new RandomLong().generate();
+        double factorAwayFromOverflow = (double) Distance.MAX_VALUE_CENTIMETERS / (double) initialCentimeters;
+        double divisorAwayFromOverflow = 1.0 / factorAwayFromOverflow;
+        double divisorToCauseOverflow = divisorAwayFromOverflow * SLIGHTLY_LESS_THAN_ONE;
+
+        return Stream.of(
+                Arguments.of(initialCentimeters, divisorToCauseOverflow),
+                Arguments.of(initialCentimeters, (-1) * divisorToCauseOverflow)
+        );
+    }
+
+    @ParameterizedTest
     @MethodSource("testEqualityOperator_data")
     public void testEqualityOperator(long centimeters1, long centimeters2, boolean distancesExpectedToBeEqual) {
         Distance distance1 = new Distance(centimeters1);
@@ -255,6 +363,18 @@ class TestDistance {
         }
     }
 
+    private double calculateCurrentFactorAwayFromOverflow() {
+        long currentAbsoluteValueCentimeters = Math.abs(patientInCentimeters_);
+        return (double) Distance.MAX_VALUE_CENTIMETERS / (double) currentAbsoluteValueCentimeters;
+    }
+
+    private double randomDivisorThatWillNotCauseOverflow() {
+        double minimumDivisorBeforeOverflow = 1.0 / calculateCurrentFactorAwayFromOverflow();
+        // setting a tighter upper bound.  Otherwise result will most often just be ~0, which does not provide meaningful coverage
+        return new RandomDouble().generate(minimumDivisorBeforeOverflow,
+                Math.min(minimumDivisorBeforeOverflow * 2.0, Double.MAX_VALUE));
+    }
+
     private static Stream<Arguments> doublesWithinValidRange(double minValue, double maxValue) {
         double randomValueWithinRange = new RandomDouble().generate(minValue, maxValue);
         return Stream.of(
@@ -265,10 +385,9 @@ class TestDistance {
     }
 
     private static Stream<Arguments> doublesOutsideValidRange(double minValue, double maxValue) {
-        final double SMALLEST_DETECTABLE_MAGNITUDE_INCREASE = 1.0 + DOUBLE_PRECISION_AS_FRACTION;
         return Stream.of(
-                Arguments.of(minValue * SMALLEST_DETECTABLE_MAGNITUDE_INCREASE),
-                Arguments.of(maxValue * SMALLEST_DETECTABLE_MAGNITUDE_INCREASE)
+                Arguments.of(minValue * SLIGHTLY_MORE_THAN_ONE),
+                Arguments.of(maxValue * SLIGHTLY_MORE_THAN_ONE)
         );
     }
 

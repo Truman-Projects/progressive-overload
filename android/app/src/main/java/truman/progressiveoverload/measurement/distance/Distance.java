@@ -63,6 +63,24 @@ public class Distance {
         return new Distance((long) centimeters);
     }
 
+    public Distance multiplyByScalar(double multiplier) throws MagnitudeOutOfRangeException {
+        double maxMultiplierBeforeOverflow = Math.abs((double) MAX_VALUE_CENTIMETERS / (double) centimeters_);
+        if (Math.abs(multiplier) > maxMultiplierBeforeOverflow) {
+            throw new MagnitudeOutOfRangeException("Multiplying by a scalar that is too large");
+        }
+        double multipliedCentimeters = (double) centimeters_ * multiplier;
+        return new Distance((long) multipliedCentimeters);
+    }
+
+    public Distance divideByScalar(double divisor) throws MagnitudeOutOfRangeException {
+        return multiplyByScalar(1.0 / divisor);
+    }
+
+    public double divideByDistance(Distance other) throws MagnitudeOutOfRangeException {
+        Distance quotient = this.divideByScalar(other.toCentimeters());
+        return quotient.toCentimeters();
+    }
+
     @Override
     public boolean equals(Object other) {
         if (other == this) {
