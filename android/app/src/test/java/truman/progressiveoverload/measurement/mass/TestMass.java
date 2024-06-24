@@ -1,4 +1,4 @@
-package truman.progressiveoverload.measurement;
+package truman.progressiveoverload.measurement.mass;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
+import truman.progressiveoverload.measurement.MagnitudeOutOfRangeException;
 import truman.progressiveoverload.randomUtilities.RandomDouble;
 import truman.progressiveoverload.randomUtilities.RandomLong;
 

@@ -3,7 +3,7 @@ package truman.progressiveoverload.goalManagement;
 
 import truman.progressiveoverload.goalManagement.api.I_GoalDataPersistenceSource;
 import truman.progressiveoverload.goalManagement.api.I_GoalManagementContainer;
-import truman.progressiveoverload.measurement.TimestampedMass;
+import truman.progressiveoverload.measurement.mass.TimestampedMass;
 
 public class GoalManagementContainer implements I_GoalManagementContainer {
     private final GoalManagementModule<TimestampedMass> massModule_;

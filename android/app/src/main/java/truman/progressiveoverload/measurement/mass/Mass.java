@@ -1,4 +1,6 @@
-package truman.progressiveoverload.measurement;
+package truman.progressiveoverload.measurement.mass;
+
+import truman.progressiveoverload.measurement.MagnitudeOutOfRangeException;
 
 public class Mass {
 

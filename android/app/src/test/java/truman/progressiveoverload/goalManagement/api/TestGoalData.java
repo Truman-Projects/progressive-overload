@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 import truman.progressiveoverload.measurement.FakeTimestampedValue;
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 import truman.progressiveoverload.measurement.RandomFakeTimestampedValue;
-import truman.progressiveoverload.measurement.TimestampedMass;
+import truman.progressiveoverload.measurement.mass.TimestampedMass;
 import truman.progressiveoverload.randomUtilities.RandomEnum;
 import truman.progressiveoverload.randomUtilities.RandomHashMap;
 import truman.progressiveoverload.randomUtilities.RandomLong;

@@ -1,4 +1,4 @@
-package truman.progressiveoverload.measurement;
+package truman.progressiveoverload.measurement.mass;
 
 import static org.junit.jupiter.api.Assertions.*;
 
