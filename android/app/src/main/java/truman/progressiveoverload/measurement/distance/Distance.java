@@ -99,6 +99,11 @@ public class Distance {
         }
     }
 
+    @Override
+    public String toString() {
+        return centimeters_ + " centimeters";
+    }
+
     private static final double CENTIMETERS_TO_METERS = 1.0e-2;
     private static final double CENTIMETERS_TO_KILOMETERS = 1.0e-5;
     private static final double CENTIMETERS_TO_INCHES = 3.937007874e-1;

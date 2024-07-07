@@ -342,6 +342,12 @@ class TestDistance {
         );
     }
 
+    @Test
+    public void testToString() {
+        String expectedStringInCentimeters = patientInCentimeters_ + " centimeters";
+        assertEquals(expectedStringInCentimeters, patient_.toString());
+    }
+
     private static long validRandomCentimeters() {
         return new RandomLong().generate(Distance.MIN_VALUE_CENTIMETERS, Distance.MAX_VALUE_CENTIMETERS);
     }
