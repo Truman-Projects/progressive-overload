@@ -6,12 +6,16 @@ public class Mass {
 
     private final long milligrams_;
 
-    public Mass(long milligrams) {
+    private Mass(long milligrams) {
         milligrams_ = milligrams;
     }
 
     public long toMilligrams() {
         return milligrams_;
+    }
+
+    public static Mass fromMilligrams(long milligrams) {
+        return new Mass(milligrams);
     }
 
     public double toGrams() {
@@ -23,7 +27,7 @@ public class Mass {
             throw new MagnitudeOutOfRangeException("Attempting to instantiate Mass with too many grams");
         }
         double milligrams = grams / MILLIGRAMS_TO_GRAMS;
-        return new Mass((long) milligrams);
+        return Mass.fromMilligrams((long) milligrams);
     }
 
     public double toKilograms() {
@@ -35,7 +39,7 @@ public class Mass {
             throw new MagnitudeOutOfRangeException("Attempting to instantiate Mass with too many kilograms");
         }
         double milligrams = kilograms / MILLIGRAMS_TO_KILOGRAMS;
-        return new Mass((long) milligrams);
+        return Mass.fromMilligrams((long) milligrams);
     }
 
     public double toPounds() {
@@ -47,7 +51,7 @@ public class Mass {
             throw new MagnitudeOutOfRangeException("Attempting to instantiate Mass with too many pounds");
         }
         double milligrams = pounds / MILLIGRAMS_TO_POUNDS;
-        return new Mass((long) milligrams);
+        return Mass.fromMilligrams((long) milligrams);
     }
 
     public Mass plus(Mass other) throws MagnitudeOutOfRangeException {
@@ -64,12 +68,12 @@ public class Mass {
         }
 
         long combinedMilligrams = this.milligrams_ + other.toMilligrams();
-        return new Mass(combinedMilligrams);
+        return Mass.fromMilligrams(combinedMilligrams);
     }
 
     public Mass minus(Mass other) {
         long subtractedMilligrams = this.milligrams_ - other.toMilligrams();
-        return new Mass(subtractedMilligrams);
+        return Mass.fromMilligrams(subtractedMilligrams);
     }
 
     @Override

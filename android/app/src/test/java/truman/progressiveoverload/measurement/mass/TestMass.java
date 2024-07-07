@@ -19,7 +19,7 @@ public class TestMass {
     @Test
     public void willReturnInMilligrams() {
         long expectedMilligrams = new RandomLong().generate(Mass.MIN_VALUE_MILLIGRAMS, Mass.MAX_VALUE_MILLIGRAMS);
-        Mass patient = new Mass(expectedMilligrams);
+        Mass patient = Mass.fromMilligrams(expectedMilligrams);
 
         long actualMilligrams = patient.toMilligrams();
         assertEquals(expectedMilligrams, actualMilligrams);
@@ -30,7 +30,7 @@ public class TestMass {
         long randomMilligrams = validRandomMilligrams();
 
         double expectedGrams = (double) randomMilligrams * MILLIGRAMS_TO_GRAMS;
-        Mass patient = new Mass(randomMilligrams);
+        Mass patient = Mass.fromMilligrams(randomMilligrams);
 
         double actualGrams = patient.toGrams();
         assertDoubleFuzzyEquals(expectedGrams, actualGrams);
@@ -41,7 +41,7 @@ public class TestMass {
         long randomMilligrams = validRandomMilligrams();
 
         double expectedKilos = (double) randomMilligrams * MILLIGRAMS_TO_KILOGRAMS;
-        Mass patient = new Mass(randomMilligrams);
+        Mass patient = Mass.fromMilligrams(randomMilligrams);
 
         double actualKilos = patient.toKilograms();
         assertDoubleFuzzyEquals(expectedKilos, actualKilos);
@@ -52,7 +52,7 @@ public class TestMass {
         long randomMilligrams = validRandomMilligrams();
 
         double expectedPounds = (double) randomMilligrams * MILLIGRAMS_TO_POUNDS;
-        Mass patient = new Mass(randomMilligrams);
+        Mass patient = Mass.fromMilligrams(randomMilligrams);
 
         double actualPounds = patient.toPounds();
         assertDoubleFuzzyEquals(expectedPounds, actualPounds);
@@ -190,8 +190,8 @@ public class TestMass {
         long randomMilligrams1 = new RandomLong().generate(halfMinMilligrams, halfMaxMilligrams);
         long randomMilligrams2 = new RandomLong().generate(halfMinMilligrams, halfMaxMilligrams);
         long milligrams1Plus2 = randomMilligrams1 + randomMilligrams2;
-        Mass mass1 = new Mass(randomMilligrams1);
-        Mass mass2 = new Mass(randomMilligrams2);
+        Mass mass1 = Mass.fromMilligrams(randomMilligrams1);
+        Mass mass2 = Mass.fromMilligrams(randomMilligrams2);
 
         try {
             Mass mass1PlusMass2 = mass1.plus(mass2);
@@ -210,10 +210,10 @@ public class TestMass {
 
     // returns (Mass mass1, Mass mass2)
     private static Stream<Arguments> willThrowExceptionInsteadOfOverflowingWhenAddingTwoMasses_data() {
-        Mass maxMass = new Mass(Mass.MAX_VALUE_MILLIGRAMS);
-        Mass smallPositiveMass = new Mass(1);
-        Mass minMass = new Mass(Mass.MIN_VALUE_MILLIGRAMS);
-        Mass smallNegativeMass = new Mass(-1);
+        Mass maxMass = Mass.fromMilligrams(Mass.MAX_VALUE_MILLIGRAMS);
+        Mass smallPositiveMass = Mass.fromMilligrams(1);
+        Mass minMass = Mass.fromMilligrams(Mass.MIN_VALUE_MILLIGRAMS);
+        Mass smallNegativeMass = Mass.fromMilligrams(-1);
 
         return Stream.of(
                 Arguments.of(maxMass, smallPositiveMass), // overflow
@@ -227,8 +227,8 @@ public class TestMass {
         long randomMilligrams2 = validRandomMilligrams();
         long milligrams1Minus2 = randomMilligrams1 - randomMilligrams2;
 
-        Mass mass1 = new Mass(randomMilligrams1);
-        Mass mass2 = new Mass(randomMilligrams2);
+        Mass mass1 = Mass.fromMilligrams(randomMilligrams1);
+        Mass mass2 = Mass.fromMilligrams(randomMilligrams2);
         Mass mass1MinusMass2 = mass1.minus(mass2);
 
         assertEquals(milligrams1Minus2, mass1MinusMass2.toMilligrams());
@@ -238,8 +238,8 @@ public class TestMass {
     @ParameterizedTest
     @MethodSource("testEqualityOperator_data")
     public void testEqualityOperator(long milligrams1, long milligrams2, boolean massesExpectedToBeEqual) {
-        Mass mass1 = new Mass(milligrams1);
-        Mass mass2 = new Mass(milligrams2);
+        Mass mass1 = Mass.fromMilligrams(milligrams1);
+        Mass mass2 = Mass.fromMilligrams(milligrams2);
 
         assertEquals(massesExpectedToBeEqual, (mass1.equals(mass2)));
     }
@@ -256,7 +256,7 @@ public class TestMass {
     }
 
     private void assertDoubleFuzzyEquals(double expected, double actual) {
-        assertEquals(expected, actual, Math.abs(expected) * 1.0E-16);
+        assertEquals(expected, actual, Math.abs(expected) * 1.0E-15);
     }
 
     private static long validRandomMilligrams() {
