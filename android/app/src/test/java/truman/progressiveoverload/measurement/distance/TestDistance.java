@@ -29,7 +29,7 @@ class TestDistance {
     }
 
     private void resetPatient() {
-        patient_ = new Distance(patientInCentimeters_);
+        patient_ = Distance.fromCentimeters(patientInCentimeters_);
     }
 
     @Test
@@ -291,7 +291,7 @@ class TestDistance {
     public void canDivideByValidDistance() {
         long randomValidDivisor = (long) Math.ceil(randomDivisorThatWillNotCauseOverflow());
         double expectedQuotient = ((double) patientInCentimeters_ / randomValidDivisor);
-        Distance divisor = new Distance(randomValidDivisor);
+        Distance divisor = Distance.fromCentimeters(randomValidDivisor);
         failOnException(() -> {
             double actualQuotient = patient_.divideByDistance(divisor);
 
@@ -304,7 +304,7 @@ class TestDistance {
     public void willThrowExceptionAttemptingToDivideByInvalidDistance(long initialCentimeters, double invalidDivisor) {
         patientInCentimeters_ = initialCentimeters;
         resetPatient();
-        Distance divisor = new Distance((long) invalidDivisor);
+        Distance divisor = Distance.fromCentimeters((long) invalidDivisor);
         assertThrows(MagnitudeOutOfRangeException.class, () -> patient_.divideByDistance(divisor));
     }
 
@@ -324,8 +324,8 @@ class TestDistance {
     @ParameterizedTest
     @MethodSource("testEqualityOperator_data")
     public void testEqualityOperator(long centimeters1, long centimeters2, boolean distancesExpectedToBeEqual) {
-        Distance distance1 = new Distance(centimeters1);
-        Distance distance2 = new Distance(centimeters2);
+        Distance distance1 = Distance.fromCentimeters(centimeters1);
+        Distance distance2 = Distance.fromCentimeters(centimeters2);
 
         assertEquals(distancesExpectedToBeEqual, distance1.equals(distance2));
     }

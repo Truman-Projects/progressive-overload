@@ -5,12 +5,16 @@ import truman.progressiveoverload.measurement.MagnitudeOutOfRangeException;
 public class Distance {
     private final long centimeters_;
 
-    public Distance(long centimeters) {
+    private Distance(long centimeters) {
         centimeters_ = centimeters;
     }
 
     public long toCentimeters() {
         return centimeters_;
+    }
+
+    public static Distance fromCentimeters(long centimeters) {
+        return new Distance(centimeters);
     }
 
     public double toMeters() {
