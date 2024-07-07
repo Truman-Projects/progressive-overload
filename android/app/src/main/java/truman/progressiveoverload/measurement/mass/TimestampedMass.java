@@ -1,16 +1,14 @@
 package truman.progressiveoverload.measurement.mass;
 
-import java.time.LocalDateTime;
-
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 
 public class TimestampedMass implements I_TimestampedValue {
     private final Mass mass_;
-    private final LocalDateTime timestamp_;
+    private final long unixTimestampMilliseconds_;
 
-    public TimestampedMass(Mass mass, LocalDateTime timestamp) {
+    public TimestampedMass(Mass mass, long unixTimestampMilliseconds) {
         mass_ = mass;
-        timestamp_ = timestamp;
+        unixTimestampMilliseconds_ = unixTimestampMilliseconds;
     }
 
     @Override
@@ -19,8 +17,8 @@ public class TimestampedMass implements I_TimestampedValue {
     }
 
     @Override
-    public LocalDateTime timestamp() {
-        return timestamp_;
+    public long unixTimestampMilliseconds() {
+        return unixTimestampMilliseconds_;
     }
 
     public Mass mass() {

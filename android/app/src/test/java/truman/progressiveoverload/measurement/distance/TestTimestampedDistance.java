@@ -5,20 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-
-import truman.progressiveoverload.randomUtilities.RandomLocalDateTime;
+import truman.progressiveoverload.randomUtilities.RandomLong;
 
 class TestTimestampedDistance {
     private Distance distance_;
-    private LocalDateTime timestamp_;
+    private long unixTimestampMilliseconds_;
     private TimestampedDistance patient_;
 
     @BeforeEach
     public void resetEverything() {
         distance_ = new RandomDistance().generate();
-        timestamp_ = new RandomLocalDateTime().generate();
-        patient_ = new TimestampedDistance(distance_, timestamp_);
+        unixTimestampMilliseconds_ = new RandomLong().generate();
+        patient_ = new TimestampedDistance(distance_, unixTimestampMilliseconds_);
     }
 
     @Test
@@ -28,7 +26,7 @@ class TestTimestampedDistance {
 
     @Test
     public void willReturnCorrectTimestamp() {
-        assertEquals(timestamp_, patient_.timestamp());
+        assertEquals(unixTimestampMilliseconds_, patient_.unixTimestampMilliseconds());
     }
 
     @Test

@@ -1,21 +1,19 @@
 package truman.progressiveoverload.measurement;
 
-import java.time.LocalDateTime;
-
 public class FakeTimestampedValue implements I_TimestampedValue {
     private final long value_;
-    private final LocalDateTime timestamp_;
+    private final long unixTimestampMilliseconds_;
 
-    public FakeTimestampedValue(long value, LocalDateTime timestamp) {
+    public FakeTimestampedValue(long value, Long unixTimestampMilliseconds) {
         value_ = value;
-        timestamp_ = timestamp;
+        unixTimestampMilliseconds_ = unixTimestampMilliseconds;
     }
 
     public long valueInDefaultUnits() {
         return value_;
     }
 
-    public LocalDateTime timestamp() {
-        return timestamp_;
+    public long unixTimestampMilliseconds() {
+        return unixTimestampMilliseconds_;
     }
 }

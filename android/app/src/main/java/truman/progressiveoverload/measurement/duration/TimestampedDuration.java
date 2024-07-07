@@ -1,17 +1,16 @@
 package truman.progressiveoverload.measurement.duration;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 
 public class TimestampedDuration implements I_TimestampedValue {
     private final Duration duration_;
-    private final LocalDateTime timestamp_;
+    private final long unixTimestampMilliseconds_;
 
-    public TimestampedDuration(Duration duration, LocalDateTime timestamp) {
+    public TimestampedDuration(Duration duration, long unixTimestampMilliseconds) {
         duration_ = duration;
-        timestamp_ = timestamp;
+        unixTimestampMilliseconds_ = unixTimestampMilliseconds;
     }
 
     @Override
@@ -20,8 +19,8 @@ public class TimestampedDuration implements I_TimestampedValue {
     }
 
     @Override
-    public LocalDateTime timestamp() {
-        return timestamp_;
+    public long unixTimestampMilliseconds() {
+        return unixTimestampMilliseconds_;
     }
 
     public Duration duration() {

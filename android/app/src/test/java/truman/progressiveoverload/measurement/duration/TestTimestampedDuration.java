@@ -6,21 +6,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 import truman.progressiveoverload.randomUtilities.RandomDuration;
-import truman.progressiveoverload.randomUtilities.RandomLocalDateTime;
+import truman.progressiveoverload.randomUtilities.RandomLong;
 
 class TestTimestampedDuration {
     private Duration duration_;
-    private LocalDateTime timestamp_;
+    private long unixTimestampMilliseconds_;
     private TimestampedDuration patient_;
 
     @BeforeEach
     public void resetEverything() {
         duration_ = new RandomDuration().generate();
-        timestamp_ = new RandomLocalDateTime().generate();
-        patient_ = new TimestampedDuration(duration_, timestamp_);
+        unixTimestampMilliseconds_ = new RandomLong().generate();
+        patient_ = new TimestampedDuration(duration_, unixTimestampMilliseconds_);
     }
 
     @Test
@@ -30,7 +29,7 @@ class TestTimestampedDuration {
 
     @Test
     public void willReturnCorrectTimestamp() {
-        assertEquals(timestamp_, patient_.timestamp());
+        assertEquals(unixTimestampMilliseconds_, patient_.unixTimestampMilliseconds());
     }
 
     @Test

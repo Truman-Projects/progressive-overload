@@ -1,17 +1,15 @@
 package truman.progressiveoverload.measurement.distance;
 
 
-import java.time.LocalDateTime;
-
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 
 public class TimestampedDistance implements I_TimestampedValue {
     private final Distance distance_;
-    private final LocalDateTime timestamp_;
+    private final long unixTimestampMilliseconds_;
 
-    public TimestampedDistance(Distance distance, LocalDateTime timestamp) {
+    public TimestampedDistance(Distance distance, long unixTimestampMilliseconds) {
         distance_ = distance;
-        timestamp_ = timestamp;
+        unixTimestampMilliseconds_ = unixTimestampMilliseconds;
     }
 
     @Override
@@ -20,8 +18,8 @@ public class TimestampedDistance implements I_TimestampedValue {
     }
 
     @Override
-    public LocalDateTime timestamp() {
-        return timestamp_;
+    public long unixTimestampMilliseconds() {
+        return unixTimestampMilliseconds_;
     }
 
     public Distance distance() {
