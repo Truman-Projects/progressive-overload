@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
-import truman.progressiveoverload.measurement.FakeTimestampedValue;
+import truman.progressiveoverload.measurement.fake.FakeTimestampedValue;
 import truman.progressiveoverload.measurement.I_TimestampedValue;
-import truman.progressiveoverload.measurement.RandomFakeTimestampedValue;
+import truman.progressiveoverload.measurement.fake.RandomFakeTimestampedValue;
 import truman.progressiveoverload.measurement.mass.TimestampedMass;
 import truman.progressiveoverload.randomUtilities.RandomEnum;
 import truman.progressiveoverload.randomUtilities.RandomHashMap;

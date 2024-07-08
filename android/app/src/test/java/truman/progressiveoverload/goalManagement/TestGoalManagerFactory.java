@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
-import truman.progressiveoverload.measurement.FakeTimestampedValue;
+import truman.progressiveoverload.measurement.fake.FakeTimestampedValue;
 
 class TestGoalManagerFactory {
     @Test

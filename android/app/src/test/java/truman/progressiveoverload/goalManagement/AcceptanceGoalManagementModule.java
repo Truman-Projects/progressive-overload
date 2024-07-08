@@ -22,8 +22,8 @@ import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdater;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
-import truman.progressiveoverload.measurement.FakeTimestampedValue;
-import truman.progressiveoverload.measurement.RandomFakeTimestampedValue;
+import truman.progressiveoverload.measurement.fake.FakeTimestampedValue;
+import truman.progressiveoverload.measurement.fake.RandomFakeTimestampedValue;
 import truman.progressiveoverload.randomUtilities.RandomHashMap;
 import truman.progressiveoverload.randomUtilities.RandomLong;
 

@@ -2,8 +2,8 @@ package truman.progressiveoverload.goalManagement.api;
 
 import java.util.HashMap;
 
-import truman.progressiveoverload.measurement.FakeTimestampedValue;
-import truman.progressiveoverload.measurement.RandomFakeTimestampedValue;
+import truman.progressiveoverload.measurement.fake.FakeTimestampedValue;
+import truman.progressiveoverload.measurement.fake.RandomFakeTimestampedValue;
 import truman.progressiveoverload.randomUtilities.I_RandomValueGenerator;
 import truman.progressiveoverload.randomUtilities.RandomEnum;
 import truman.progressiveoverload.randomUtilities.RandomHashMap;
