@@ -6,18 +6,22 @@ import truman.progressiveoverload.goalManagement.api.I_GoalManagementContainer;
 import truman.progressiveoverload.measurement.distance.TimestampedDistance;
 import truman.progressiveoverload.measurement.duration.TimestampedDuration;
 import truman.progressiveoverload.measurement.mass.TimestampedMass;
+import truman.progressiveoverload.measurement.velocity.TimestampedVelocity;
 
 public class GoalManagementContainer implements I_GoalManagementContainer {
     private final GoalManagementModule<TimestampedMass> massModule_;
     private final GoalManagementModule<TimestampedDistance> distanceModule_;
     private final GoalManagementModule<TimestampedDuration> durationModule_;
+    private final GoalManagementModule<TimestampedVelocity> velocityModule_;
 
     public GoalManagementContainer(I_GoalDataPersistenceSource<TimestampedMass> persistenceSourceForMassGoals,
                                    I_GoalDataPersistenceSource<TimestampedDistance> persistenceSourceForDistanceGoals,
-                                   I_GoalDataPersistenceSource<TimestampedDuration> persistenceSourceForDurationGoals) {
+                                   I_GoalDataPersistenceSource<TimestampedDuration> persistenceSourceForDurationGoals,
+                                   I_GoalDataPersistenceSource<TimestampedVelocity> persistenceSourceForVelocityGoals) {
         massModule_ = new GoalManagementModule<>(persistenceSourceForMassGoals);
         distanceModule_ = new GoalManagementModule<>(persistenceSourceForDistanceGoals);
         durationModule_ = new GoalManagementModule<>(persistenceSourceForDurationGoals);
+        velocityModule_ = new GoalManagementModule<>(persistenceSourceForVelocityGoals);
     }
 
     @Override
@@ -33,6 +37,11 @@ public class GoalManagementContainer implements I_GoalManagementContainer {
     @Override
     public GoalManagementModule<TimestampedDuration> durationModule() {
         return durationModule_;
+    }
+
+    @Override
+    public GoalManagementModule<TimestampedVelocity> velocityModule() {
+        return velocityModule_;
     }
 
 }
