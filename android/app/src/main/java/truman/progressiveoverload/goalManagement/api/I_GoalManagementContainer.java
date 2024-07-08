@@ -1,6 +1,7 @@
 package truman.progressiveoverload.goalManagement.api;
 
 import truman.progressiveoverload.goalManagement.GoalManagementModule;
+import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;
 import truman.progressiveoverload.measurement.distance.TimestampedDistance;
 import truman.progressiveoverload.measurement.duration.TimestampedDuration;
 import truman.progressiveoverload.measurement.mass.TimestampedMass;
@@ -14,4 +15,6 @@ public interface I_GoalManagementContainer {
     GoalManagementModule<TimestampedDuration> durationModule();
 
     GoalManagementModule<TimestampedVelocity> velocityModule();
+
+    GoalManagementModule<TimestampedCustomValue> customUnitModule();
 }
