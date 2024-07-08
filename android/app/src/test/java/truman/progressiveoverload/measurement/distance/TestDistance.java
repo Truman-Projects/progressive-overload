@@ -397,8 +397,8 @@ class TestDistance {
         );
     }
 
-    private final double CENTIMETERS_TO_METERS = (double) 1e-2;
-    private final double CENTIMETERS_TO_KILOMETERS = (double) 1e-5;
+    private final double CENTIMETERS_TO_METERS = 1e-2;
+    private final double CENTIMETERS_TO_KILOMETERS = 1e-5;
     private final double CENTIMETERS_TO_INCHES = 3.937007874e-1;
     private final double CENTIMETERS_TO_FEET = CENTIMETERS_TO_INCHES / 12.0;
     private final double CENTIMETERS_TO_MILES = 6.2137e-6;

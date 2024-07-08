@@ -185,8 +185,8 @@ public class TestMass {
 
     @Test
     public void canAddTwoMasses() {
-        long halfMaxMilligrams = (long) (Mass.MAX_VALUE_MILLIGRAMS / 2);
-        long halfMinMilligrams = (long) (Mass.MIN_VALUE_MILLIGRAMS / 2);
+        long halfMaxMilligrams = (Mass.MAX_VALUE_MILLIGRAMS / 2);
+        long halfMinMilligrams = (Mass.MIN_VALUE_MILLIGRAMS / 2);
         long randomMilligrams1 = new RandomLong().generate(halfMinMilligrams, halfMaxMilligrams);
         long randomMilligrams2 = new RandomLong().generate(halfMinMilligrams, halfMaxMilligrams);
         long milligrams1Plus2 = randomMilligrams1 + randomMilligrams2;
@@ -263,8 +263,8 @@ public class TestMass {
         return new RandomLong().generate(Mass.MIN_VALUE_MILLIGRAMS, Mass.MAX_VALUE_MILLIGRAMS);
     }
 
-    private final double MILLIGRAMS_TO_GRAMS = (double) 1e-3;
-    private final double MILLIGRAMS_TO_KILOGRAMS = (double) 1e-6;
+    private final double MILLIGRAMS_TO_GRAMS = 1e-3;
+    private final double MILLIGRAMS_TO_KILOGRAMS = 1e-6;
     private final double MILLIGRAMS_TO_POUNDS = 2.20462e-6;
 
 }

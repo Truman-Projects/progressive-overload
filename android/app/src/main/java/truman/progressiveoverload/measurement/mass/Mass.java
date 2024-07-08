@@ -87,8 +87,8 @@ public class Mass {
         return (this.milligrams_ == ((Mass) other).toMilligrams());
     }
 
-    private static final double MILLIGRAMS_TO_GRAMS = (double) 1e-3;
-    private static final double MILLIGRAMS_TO_KILOGRAMS = (double) 1e-6;
+    private static final double MILLIGRAMS_TO_GRAMS = 1e-3;
+    private static final double MILLIGRAMS_TO_KILOGRAMS = 1e-6;
     private static final double MILLIGRAMS_TO_POUNDS = 2.20462e-6;
 
     public static final long MIN_VALUE_MILLIGRAMS = Long.MIN_VALUE;
