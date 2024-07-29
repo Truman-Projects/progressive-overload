@@ -301,8 +301,9 @@ class TestGoalRegistry {
 
     @Test
     public void willCorrectlyIncrementGoalIdsAfterInitializing() {
-        HashMap<Long, GoalData<FakeTimestampedValue>> goalsFromPersistenceSource = new RandomHashMap<>(new RandomLong(),
-                randomGoalDataGenerator_).generate();
+        HashMap<Long, GoalData<FakeTimestampedValue>> goalsFromPersistenceSource =
+                new RandomHashMap<>(new RandomLong((candidateLong) -> candidateLong > 0),
+                        randomGoalDataGenerator_).generate();
         Long expectedNextGoalId = Collections.max(goalsFromPersistenceSource.keySet()) + 1L;
 
         patient_.initializeWithExistingGoals(goalsFromPersistenceSource);
