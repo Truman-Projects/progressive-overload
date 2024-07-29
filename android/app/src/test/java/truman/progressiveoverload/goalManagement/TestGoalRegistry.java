@@ -22,6 +22,7 @@ import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
 import truman.progressiveoverload.measurement.fake.FakeTimestampedValue;
+import truman.progressiveoverload.measurement.fake.RandomFakeTimestampedValue;
 import truman.progressiveoverload.randomUtilities.RandomArrayList;
 import truman.progressiveoverload.randomUtilities.RandomHashMap;
 import truman.progressiveoverload.randomUtilities.RandomInt;
@@ -38,7 +39,7 @@ class TestGoalRegistry {
     }
 
 
-    private final RandomGoalData randomGoalDataGenerator_ = new RandomGoalData();
+    private final RandomGoalData<FakeTimestampedValue> randomGoalDataGenerator_ = new RandomGoalData<>(new RandomFakeTimestampedValue());
     private I_GoalRegistryListener[] listenerList_;
     private I_FakeValueGoalManagerFactory goalManagerFactory_;
     private GoalRegistry<FakeTimestampedValue> patient_;

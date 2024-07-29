@@ -14,6 +14,7 @@ import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.I_GoalDataPersistenceSource;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
 import truman.progressiveoverload.measurement.fake.FakeTimestampedValue;
+import truman.progressiveoverload.measurement.fake.RandomFakeTimestampedValue;
 import truman.progressiveoverload.randomUtilities.RandomHashMap;
 import truman.progressiveoverload.randomUtilities.RandomLong;
 
@@ -60,7 +61,7 @@ class TestGoalRegistryInitializer {
     @Test
     public void willInitializeGoalRegistryWithPersistenceData() {
         HashMap<Long, GoalData<FakeTimestampedValue>> persistenceData =
-                new RandomHashMap<>(new RandomLong(), new RandomGoalData()).generate();
+                new RandomHashMap<>(new RandomLong(), new RandomGoalData<>(new RandomFakeTimestampedValue())).generate();
         when(persistenceSource_.loadGoalDataFromMemory()).thenReturn(persistenceData);
 
         patient_.initializeGoalRegistry();

@@ -36,6 +36,7 @@ class AcceptanceGoalManagementModule {
     private interface I_FakeValueGoalListener extends I_GoalListener<FakeTimestampedValue> {
     }
 
+    private final RandomGoalData<FakeTimestampedValue> goalDataGenerator_ = new RandomGoalData<>(new RandomFakeTimestampedValue());
     private I_GoalRegistryListener[] goalRegistryListenerList_;
     private I_FakeValueGoalListener[] goalListenerList_;
     private I_FakeValueGoalDataPersistenceSource persistenceSource_;
@@ -63,7 +64,7 @@ class AcceptanceGoalManagementModule {
     @Test
     public void initializesModuleUsingPersistenceData() {
         HashMap<Long, GoalData<FakeTimestampedValue>> persistenceData =
-                new RandomHashMap<>(new RandomLong(), new RandomGoalData()).generate();
+                new RandomHashMap<>(new RandomLong(), goalDataGenerator_).generate();
         when(persistenceSource_.loadGoalDataFromMemory()).thenReturn(persistenceData);
         HashSet<Long> expectedGoalIdSet = new HashSet<>(persistenceData.keySet());
 
@@ -75,7 +76,7 @@ class AcceptanceGoalManagementModule {
 
     @Test
     public void willNotifyGoalRegistryListenersWhenSetOfGoalChanges() {
-        GoalData<FakeTimestampedValue> goalData = new RandomGoalData().generate();
+        GoalData<FakeTimestampedValue> goalData = goalDataGenerator_.generate();
         patient_.goalRegistryNotifier().registerListener(goalRegistryListenerList_[0]);
         patient_.goalRegistryNotifier().registerListener(goalRegistryListenerList_[1]);
 
@@ -87,7 +88,7 @@ class AcceptanceGoalManagementModule {
 
     @Test
     public void willNotifyGoalListenersWhenGoalChanges() {
-        GoalData<FakeTimestampedValue> goalData = new RandomGoalData().generate();
+        GoalData<FakeTimestampedValue> goalData = goalDataGenerator_.generate();
         FakeTimestampedValue milestone = new RandomFakeTimestampedValue().generate();
         I_GoalRegistryNotifier<FakeTimestampedValue> goalRegistryNotifier = patient_.goalRegistryNotifier();
         I_GoalRegistryUpdater<FakeTimestampedValue> goalRegistryUpdater = patient_.goalRegistryUpdater();

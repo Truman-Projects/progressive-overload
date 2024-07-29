@@ -37,7 +37,7 @@ class TestGoalManager {
     private interface I_FakeValueGoalListener extends I_GoalListener<FakeTimestampedValue> {
     }
 
-    private static final RandomGoalData goalDataGen_ = new RandomGoalData();
+    private static final RandomGoalData<FakeTimestampedValue> goalDataGen_ = new RandomGoalData<>(new RandomFakeTimestampedValue());
     private I_FakeValueGoalListener[] listenerList_;
     private GoalData<FakeTimestampedValue> initialGoalData_;
     private GoalManager<FakeTimestampedValue> patient_;

@@ -23,6 +23,7 @@ import truman.progressiveoverload.randomUtilities.RandomString;
 
 class TestGoalData {
     private static final RandomFakeTimestampedValue fakeTimestampedValueGenerator_ = new RandomFakeTimestampedValue();
+    private final RandomGoalData<FakeTimestampedValue> goalDataGenerator_ = new RandomGoalData<>(fakeTimestampedValueGenerator_);
     private static final RandomHashMap<Long, FakeTimestampedValue> timestampedValueHashMapGenerator_ =
             new RandomHashMap<>(new RandomLong(), fakeTimestampedValueGenerator_);
 
@@ -86,7 +87,7 @@ class TestGoalData {
 
     @Test
     public void withNameWillReturnCopyWithNewName() {
-        GoalData<FakeTimestampedValue> originalGoalData = new RandomGoalData().generate();
+        GoalData<FakeTimestampedValue> originalGoalData = goalDataGenerator_.generate();
         String newName = new RandomString().generate();
 
         GoalData<FakeTimestampedValue> goalDataWithNewName = originalGoalData.withName(newName);
@@ -99,7 +100,7 @@ class TestGoalData {
 
     @Test
     public void withDescriptionWillReturnCopyWithNewDescription() {
-        GoalData<FakeTimestampedValue> originalGoalData = new RandomGoalData().generate();
+        GoalData<FakeTimestampedValue> originalGoalData = goalDataGenerator_.generate();
         String newDescription = new RandomString().generate();
 
         GoalData<FakeTimestampedValue> goalDataWithNewDescription = originalGoalData.withDescription(newDescription);
@@ -113,7 +114,7 @@ class TestGoalData {
     @ParameterizedTest
     @MethodSource("withGoalTypeWillReturnCopyWithNewGoalType_data")
     public void withGoalTypeWillReturnCopyWithNewGoalType_data(GoalType originalGoalType, GoalType newGoalType) {
-        GoalData<FakeTimestampedValue> originalGoalData = new RandomGoalData().generate().withGoalType(originalGoalType);
+        GoalData<FakeTimestampedValue> originalGoalData = goalDataGenerator_.generate().withGoalType(originalGoalType);
 
         GoalData<FakeTimestampedValue> goalDataWithNewGoalType = originalGoalData.withGoalType(newGoalType);
 
@@ -135,7 +136,7 @@ class TestGoalData {
 
     @Test
     public void withRecordsByIdWillReturnCopyWithNewRecords() {
-        GoalData<FakeTimestampedValue> originalGoalData = new RandomGoalData().generate();
+        GoalData<FakeTimestampedValue> originalGoalData = goalDataGenerator_.generate();
         HashMap<Long, FakeTimestampedValue> newRecords = timestampedValueHashMapGenerator_.generate();
 
         GoalData<FakeTimestampedValue> goalDataWithNewRecords = originalGoalData.withRecordsById(newRecords);
@@ -148,7 +149,7 @@ class TestGoalData {
 
     @Test
     public void withTargetMilestonesByIdWillReturnCopyWithNewTargetMilestones() {
-        GoalData<FakeTimestampedValue> originalGoalData = new RandomGoalData().generate();
+        GoalData<FakeTimestampedValue> originalGoalData = goalDataGenerator_.generate();
         HashMap<Long, FakeTimestampedValue> newTargetMilestones = timestampedValueHashMapGenerator_.generate();
 
         GoalData<FakeTimestampedValue> goalDataWithNewTargetMilestones = originalGoalData.withTargetMilestonesById(newTargetMilestones);
@@ -163,7 +164,7 @@ class TestGoalData {
     @Test
     public void willReturnRecordsByCopy() {
         RandomOther<Long> uniqueKeyGenerator = new RandomOther<>(new RandomLong());
-        GoalData<FakeTimestampedValue> patient = new RandomGoalData().generate();
+        GoalData<FakeTimestampedValue> patient = goalDataGenerator_.generate();
         HashMap<Long, FakeTimestampedValue> originalRecords = new HashMap<>(patient.recordsById());
         // random key value pair to attempt to alter records received from getter
         Long randomKey = uniqueKeyGenerator.otherThan(new ArrayList<>(patient.recordsById().keySet()));
@@ -178,7 +179,7 @@ class TestGoalData {
     @Test
     public void willReturnTargetMilestonesByCopy() {
         RandomOther<Long> uniqueKeyGenerator = new RandomOther<>(new RandomLong());
-        GoalData<FakeTimestampedValue> patient = new RandomGoalData().generate();
+        GoalData<FakeTimestampedValue> patient = goalDataGenerator_.generate();
         HashMap<Long, FakeTimestampedValue> originalTargetMilestones = new HashMap<>(patient.targetMilestonesById());
         // random key value pair to attempt to alter targetMilestones received from getter
         Long randomKey = uniqueKeyGenerator.otherThan(new ArrayList<>(patient.recordsById().keySet()));
@@ -238,7 +239,7 @@ class TestGoalData {
 
     @Test
     public void canCompareGoalDataWithDifferentTypes() {
-        GoalData<FakeTimestampedValue> randomGoalData = new RandomGoalData().generate();
+        GoalData<FakeTimestampedValue> randomGoalData = goalDataGenerator_.generate();
         GoalData<TimestampedMass> massBasedGoalData = new GoalData<>(randomGoalData.name(), randomGoalData.description(),
                 randomGoalData.goalType());
 
