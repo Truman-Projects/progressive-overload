@@ -10,6 +10,7 @@ import truman.progressiveoverload.measurement.mass.TimestampedMass;
 import truman.progressiveoverload.measurement.velocity.TimestampedVelocity;
 
 public class GoalManagementContainer implements I_GoalManagementContainer {
+    private final UniqueIdSource idSource_;
     private final GoalManagementModule<TimestampedMass> massModule_;
     private final GoalManagementModule<TimestampedDistance> distanceModule_;
     private final GoalManagementModule<TimestampedDuration> durationModule_;
@@ -21,11 +22,12 @@ public class GoalManagementContainer implements I_GoalManagementContainer {
                                    I_GoalDataPersistenceSource<TimestampedDuration> persistenceSourceForDurationGoals,
                                    I_GoalDataPersistenceSource<TimestampedVelocity> persistenceSourceForVelocityGoals,
                                    I_GoalDataPersistenceSource<TimestampedCustomValue> persistenceSourceForCustomGoals) {
-        massModule_ = new GoalManagementModule<>(persistenceSourceForMassGoals);
-        distanceModule_ = new GoalManagementModule<>(persistenceSourceForDistanceGoals);
-        durationModule_ = new GoalManagementModule<>(persistenceSourceForDurationGoals);
-        velocityModule_ = new GoalManagementModule<>(persistenceSourceForVelocityGoals);
-        customUnitModule_ = new GoalManagementModule<>(persistenceSourceForCustomGoals);
+        idSource_ = new UniqueIdSource(new RandomLongGenerator());
+        massModule_ = new GoalManagementModule<>(persistenceSourceForMassGoals, idSource_);
+        distanceModule_ = new GoalManagementModule<>(persistenceSourceForDistanceGoals, idSource_);
+        durationModule_ = new GoalManagementModule<>(persistenceSourceForDurationGoals, idSource_);
+        velocityModule_ = new GoalManagementModule<>(persistenceSourceForVelocityGoals, idSource_);
+        customUnitModule_ = new GoalManagementModule<>(persistenceSourceForCustomGoals, idSource_);
     }
 
     @Override

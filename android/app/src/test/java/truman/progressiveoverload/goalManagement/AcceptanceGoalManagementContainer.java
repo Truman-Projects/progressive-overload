@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -63,7 +62,6 @@ class AcceptanceGoalManagementContainer {
     }
 
     @Test
-    @Disabled("Disabled until feature implemented")
     public void willNotRepeatGoalIdsAcrossModules() {
         int numberOfGoalsToGeneratePerModule = new RandomInt().generate(5, 10);
         ArrayList<Long> allGoalIds = new ArrayList<>();

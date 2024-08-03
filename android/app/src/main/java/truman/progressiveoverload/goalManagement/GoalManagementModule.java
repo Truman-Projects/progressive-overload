@@ -9,12 +9,11 @@ import truman.progressiveoverload.measurement.I_TimestampedValue;
 public class GoalManagementModule<TimestampedType extends I_TimestampedValue> implements I_GoalManagementModule<TimestampedType> {
     private final I_GoalRegistry<TimestampedType> goalRegistry_;
 
-    public GoalManagementModule(I_GoalDataPersistenceSource<TimestampedType> persistenceSource) {
+    public GoalManagementModule(I_GoalDataPersistenceSource<TimestampedType> persistenceSource, UniqueIdSource idSource) {
         GoalManagerFactory<TimestampedType> goalManagerFactory = new GoalManagerFactory<>();
-        GoalRegistryFactory<TimestampedType> goalRegistryFactory = new GoalRegistryFactory<>(goalManagerFactory);
-        GoalRegistryInitializer<TimestampedType> registryInitializer = new GoalRegistryInitializer<>(persistenceSource,
-                goalRegistryFactory);
-        goalRegistry_ = registryInitializer.initializeGoalRegistry();
+        GoalRegistryFactory<TimestampedType> goalRegistryFactory = new GoalRegistryFactory<>(persistenceSource, goalManagerFactory,
+                idSource);
+        goalRegistry_ = goalRegistryFactory.createGoalRegistry();
     }
 
     @Override

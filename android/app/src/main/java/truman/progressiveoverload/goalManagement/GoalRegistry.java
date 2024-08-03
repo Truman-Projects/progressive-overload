@@ -26,7 +26,7 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
         for (Map.Entry<Long, GoalData<TimestampedType>> idAndGoalDataPair : goalsByIdFromPersistence.entrySet()) {
             Long id = idAndGoalDataPair.getKey();
             GoalData<TimestampedType> goalData = idAndGoalDataPair.getValue();
-            
+
             boolean idIsAvailable = uniqueIdSource.attemptToReserveId(id);
             if (idIsAvailable) {
                 I_GoalManager<TimestampedType> goalManager = goalManagerFactory.createGoalManager(goalData);

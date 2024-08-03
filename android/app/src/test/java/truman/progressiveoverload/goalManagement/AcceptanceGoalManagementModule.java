@@ -40,6 +40,7 @@ class AcceptanceGoalManagementModule {
     private I_GoalRegistryListener[] goalRegistryListenerList_;
     private I_FakeValueGoalListener[] goalListenerList_;
     private I_FakeValueGoalDataPersistenceSource persistenceSource_;
+    private UniqueIdSource idSource_;
     private GoalManagementModule<FakeTimestampedValue> patient_;
 
     @BeforeEach
@@ -53,11 +54,12 @@ class AcceptanceGoalManagementModule {
                 mock(I_FakeValueGoalListener.class)
         };
         persistenceSource_ = mock(I_FakeValueGoalDataPersistenceSource.class);
+        idSource_ = new UniqueIdSource(new RandomLongGenerator());
         resetPatient();
     }
 
     public void resetPatient() {
-        patient_ = new GoalManagementModule<>(persistenceSource_);
+        patient_ = new GoalManagementModule<>(persistenceSource_, idSource_);
 
     }
 
