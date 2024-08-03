@@ -13,14 +13,26 @@ import truman.progressiveoverload.measurement.I_TimestampedValue;
 
 class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_GoalRegistry<TimestampedType> {
     private final I_GoalManagerFactory<TimestampedType> goalManagerFactory_;
+    private final UniqueIdSource idSource_;
     private final HashMap<Long, I_GoalManager<TimestampedType>> goalManagersByGoalIds_;
     private Long largestGoalId_;
     private final HashSet<I_GoalRegistryListener> listeners_;
 
-    public GoalRegistry(
-            I_GoalManagerFactory<TimestampedType> goalManagerFactory) {
+    public GoalRegistry(HashMap<Long, GoalData<TimestampedType>> goalsByIdFromPersistence,
+                        I_GoalManagerFactory<TimestampedType> goalManagerFactory, UniqueIdSource uniqueIdSource) {
         goalManagerFactory_ = goalManagerFactory;
+        idSource_ = uniqueIdSource;
         goalManagersByGoalIds_ = new HashMap<>();
+        for (Map.Entry<Long, GoalData<TimestampedType>> idAndGoalDataPair : goalsByIdFromPersistence.entrySet()) {
+            Long id = idAndGoalDataPair.getKey();
+            GoalData<TimestampedType> goalData = idAndGoalDataPair.getValue();
+            
+            boolean idIsAvailable = uniqueIdSource.attemptToReserveId(id);
+            if (idIsAvailable) {
+                I_GoalManager<TimestampedType> goalManager = goalManagerFactory.createGoalManager(goalData);
+                goalManagersByGoalIds_.put(id, goalManager);
+            }
+        }
         largestGoalId_ = -1L;
         listeners_ = new HashSet<>();
     }
@@ -60,12 +72,11 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
 
     @Override
     public Long addGoal(GoalData<TimestampedType> goalData) {
-        Long newGoalId = largestGoalId_ + 1;
+        Long newGoalId = idSource_.nextAvailableId();
         goalManagersByGoalIds_.put(newGoalId, goalManagerFactory_.createGoalManager(goalData));
         for (I_GoalRegistryListener listener : listeners_) {
             listener.goalAdded(newGoalId);
         }
-        largestGoalId_ = newGoalId;
         return newGoalId;
     }
 
