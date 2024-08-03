@@ -15,7 +15,6 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
     private final I_GoalManagerFactory<TimestampedType> goalManagerFactory_;
     private final UniqueIdSource idSource_;
     private final HashMap<Long, I_GoalManager<TimestampedType>> goalManagersByGoalIds_;
-    private Long largestGoalId_;
     private final HashSet<I_GoalRegistryListener> listeners_;
 
     public GoalRegistry(HashMap<Long, GoalData<TimestampedType>> goalsByIdFromPersistence,
@@ -33,7 +32,6 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
                 goalManagersByGoalIds_.put(id, goalManager);
             }
         }
-        largestGoalId_ = -1L;
         listeners_ = new HashSet<>();
     }
 
@@ -88,22 +86,6 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
         goalManagersByGoalIds_.remove(goalId);
         for (I_GoalRegistryListener listener : listeners_) {
             listener.goalRemoved(goalId);
-        }
-    }
-
-    //I_GoalRegistry
-    @Override
-    public void initializeWithExistingGoals(HashMap<Long, GoalData<TimestampedType>> goalsById) {
-        if (largestGoalId_.equals(-1L)) {
-            for (Map.Entry<Long, GoalData<TimestampedType>> idAndData : goalsById.entrySet()) {
-                Long goalId = idAndData.getKey();
-                GoalData<TimestampedType> goalData = idAndData.getValue();
-                I_GoalManager<TimestampedType> manager = goalManagerFactory_.createGoalManager(goalData);
-                goalManagersByGoalIds_.put(goalId, manager);
-                if (goalId > largestGoalId_) {
-                    largestGoalId_ = goalId;
-                }
-            }
         }
     }
 }

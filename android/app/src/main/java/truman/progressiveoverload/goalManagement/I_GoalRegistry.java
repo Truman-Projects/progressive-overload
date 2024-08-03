@@ -36,7 +36,4 @@ interface I_GoalRegistry<TimestampedType extends I_TimestampedValue> extends I_G
 
     @Override
     void removeGoal(Long goalId) throws InvalidQueryException;
-
-    // not exposed through any public interfaces; intended only for initialization
-    void initializeWithExistingGoals(HashMap<Long, GoalData<TimestampedType>> goalsById);
 }
