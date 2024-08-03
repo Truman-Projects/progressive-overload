@@ -94,11 +94,6 @@ class TestUniqueIdSource {
         Long idToFightOver = new RandomLong().generate();
         AtomicInteger reservationSuccessCounter = new AtomicInteger(0);
         class AttemptToReserveIdRunnable implements Runnable {
-            private final int threadId_;
-
-            public AttemptToReserveIdRunnable(int threadId) {
-                threadId_ = threadId;
-            }
 
             public void run() {
                 try {
@@ -115,8 +110,8 @@ class TestUniqueIdSource {
         }
         ExecutorService executor = Executors.newFixedThreadPool(POOL_SIZE);
 
-        for (int threadId = 0; threadId < POOL_SIZE; threadId++) {
-            executor.submit(new AttemptToReserveIdRunnable(threadId));
+        for (int threadCount = 0; threadCount < POOL_SIZE; threadCount++) {
+            executor.submit(new AttemptToReserveIdRunnable());
         }
 
         try {
