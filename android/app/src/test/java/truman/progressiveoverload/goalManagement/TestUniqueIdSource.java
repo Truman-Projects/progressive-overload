@@ -20,18 +20,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import truman.progressiveoverload.randomUtilities.RandomLong;
 import truman.progressiveoverload.randomUtilities.RandomOther;
 
-class TestIdSource {
+class TestUniqueIdSource {
 
     private Long rngResult_;
     private I_RandomLongGenerator rng_;
-    private IdSource patient_;
+    private UniqueIdSource patient_;
 
     @BeforeEach
     public void resetEverything() {
         rngResult_ = new RandomLong().generate();
         rng_ = mock(I_RandomLongGenerator.class);
         when(rng_.randomLong()).thenReturn(rngResult_);
-        patient_ = new IdSource(rng_);
+        patient_ = new UniqueIdSource(rng_);
     }
 
     @Test
