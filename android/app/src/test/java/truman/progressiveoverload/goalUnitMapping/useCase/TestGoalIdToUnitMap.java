@@ -7,11 +7,13 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryNotifier;
@@ -171,5 +173,41 @@ class TestGoalIdToUnitMap {
         assertEquals(GoalUnit.DURATION, patient_.unitForGoalId(durationGoalId));
         assertEquals(GoalUnit.VELOCITY, patient_.unitForGoalId(velocityGoalId));
         assertEquals(GoalUnit.CUSTOM, patient_.unitForGoalId(customGoalId));
+    }
+
+    private void testMappingPreviousGoalIds(GoalUnit expectedGoalUnit, I_GoalRegistryNotifier<?> mockGoalSource) {
+        HashSet<Long> goalIds = new RandomHashSet<>(new RandomLong()).generate();
+        when(mockGoalSource.currentGoalIds()).thenReturn(goalIds);
+
+        recreatePatient();
+
+        for (Long goalId : goalIds) {
+            assertEquals(expectedGoalUnit, patient_.unitForGoalId(goalId));
+        }
+    }
+
+    @Test
+    public void willCorrectlyMapPreviousMassGoalIds() {
+        testMappingPreviousGoalIds(GoalUnit.MASS, mockMassGoalRegistryNotifier_);
+    }
+
+    @Test
+    public void willCorrectlyMapPreviousDistanceGoalIds() {
+        testMappingPreviousGoalIds(GoalUnit.DISTANCE, mockDistanceGoalRegistryNotifier_);
+    }
+
+    @Test
+    public void willCorrectlyMapPreviousDurationGoalIds() {
+        testMappingPreviousGoalIds(GoalUnit.DURATION, mockDurationGoalRegistryNotifier_);
+    }
+
+    @Test
+    public void willCorrectlyMapPreviousVelocityGoalIds() {
+        testMappingPreviousGoalIds(GoalUnit.VELOCITY, mockVelocityGoalRegistryNotifier_);
+    }
+
+    @Test
+    public void willCorrectlyMapPreviousCustomGoalIds() {
+        testMappingPreviousGoalIds(GoalUnit.CUSTOM, mockCustomGoalRegistryNotifier_);
     }
 }

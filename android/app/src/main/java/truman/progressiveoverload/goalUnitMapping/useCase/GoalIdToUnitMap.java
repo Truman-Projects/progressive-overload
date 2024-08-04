@@ -21,6 +21,21 @@ public class GoalIdToUnitMap implements I_GoalIdToUnitMap {
                            I_GoalRegistryNotifier<TimestampedVelocity> velocityGoalSource,
                            I_GoalRegistryNotifier<TimestampedCustomValue> customGoalSource) {
         goalIdToUnitMap_ = new HashMap<>();
+        for (Long massGoalId : massGoalSource.currentGoalIds()) {
+            goalIdToUnitMap_.put(massGoalId, GoalUnit.MASS);
+        }
+        for (Long distanceGoalId : distanceGoalSource.currentGoalIds()) {
+            goalIdToUnitMap_.put(distanceGoalId, GoalUnit.DISTANCE);
+        }
+        for (Long durationGoalId : durationGoalSource.currentGoalIds()) {
+            goalIdToUnitMap_.put(durationGoalId, GoalUnit.DURATION);
+        }
+        for (Long velocityGoalId : velocityGoalSource.currentGoalIds()) {
+            goalIdToUnitMap_.put(velocityGoalId, GoalUnit.VELOCITY);
+        }
+        for (Long customGoalId : customGoalSource.currentGoalIds()) {
+            goalIdToUnitMap_.put(customGoalId, GoalUnit.CUSTOM);
+        }
         massGoalSource.registerListener(new GoalRegistryListener(GoalUnit.MASS));
         distanceGoalSource.registerListener(new GoalRegistryListener(GoalUnit.DISTANCE));
         durationGoalSource.registerListener(new GoalRegistryListener(GoalUnit.DURATION));
