@@ -63,12 +63,6 @@ class TestGoalIdToUnitMap {
         mockVelocityGoalRegistryNotifier_ = mock(I_VelocityGoalRegistryNotifier.class);
         mockCustomGoalRegistryNotifier_ = mock(I_CustomGoalRegistryNotifier.class);
 
-        massGoalListener_ = mock(I_GoalRegistryListener.class);
-        distanceGoalListener_ = mock(I_GoalRegistryListener.class);
-        durationGoalListener_ = mock(I_GoalRegistryListener.class);
-        velocityGoalListener_ = mock(I_GoalRegistryListener.class);
-        customGoalListener_ = mock(I_GoalRegistryListener.class);
-
         doAnswer(invocation -> {
             massGoalListener_ = invocation.getArgument(0);
             return null;
@@ -89,7 +83,6 @@ class TestGoalIdToUnitMap {
             customGoalListener_ = invocation.getArgument(0);
             return null;
         }).when(mockCustomGoalRegistryNotifier_).registerListener(any(I_GoalRegistryListener.class));
-
 
         recreatePatient();
     }
