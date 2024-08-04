@@ -12,7 +12,7 @@ import truman.progressiveoverload.measurement.duration.TimestampedDuration;
 import truman.progressiveoverload.measurement.mass.TimestampedMass;
 import truman.progressiveoverload.measurement.velocity.TimestampedVelocity;
 
-public class GoalWriter implements I_GoalWriter {
+class GoalWriter implements I_GoalWriter {
     private final I_GoalRegistryUpdater<TimestampedMass> massGoalUpdater_;
     private final I_GoalRegistryUpdater<TimestampedDistance> distanceGoalUpdater_;
     private final I_GoalRegistryUpdater<TimestampedDuration> durationGoalUpdater_;
