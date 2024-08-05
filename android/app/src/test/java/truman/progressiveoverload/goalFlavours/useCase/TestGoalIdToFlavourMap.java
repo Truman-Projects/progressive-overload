@@ -1,4 +1,4 @@
-package truman.progressiveoverload.goalUnitMapping.useCase;
+package truman.progressiveoverload.goalFlavours.useCase;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryNotifier;
-import truman.progressiveoverload.goalUnitMapping.useCase.api.GoalUnit;
+import truman.progressiveoverload.goalFlavours.useCase.api.GoalFlavour;
 import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;
 import truman.progressiveoverload.measurement.distance.TimestampedDistance;
 import truman.progressiveoverload.measurement.duration.TimestampedDuration;
@@ -27,7 +27,7 @@ import truman.progressiveoverload.measurement.velocity.TimestampedVelocity;
 import truman.progressiveoverload.randomUtilities.RandomHashSet;
 import truman.progressiveoverload.randomUtilities.RandomLong;
 
-class TestGoalIdToUnitMap {
+class TestGoalIdToFlavourMap {
 
     private interface I_MassGoalRegistryNotifier extends I_GoalRegistryNotifier<TimestampedMass> {
     }
@@ -56,7 +56,7 @@ class TestGoalIdToUnitMap {
     private I_GoalRegistryListener velocityGoalListener_;
     private I_GoalRegistryListener customGoalListener_;
 
-    private GoalIdToUnitMap patient_;
+    private GoalIdToFlavourMap patient_;
 
     @BeforeEach
     public void resetEverything() {
@@ -94,18 +94,18 @@ class TestGoalIdToUnitMap {
         clearInvocations(mockMassGoalRegistryNotifier_, mockDistanceGoalRegistryNotifier_, mockDurationGoalRegistryNotifier_,
                 mockVelocityGoalRegistryNotifier_, mockCustomGoalRegistryNotifier_);
 
-        patient_ = new GoalIdToUnitMap(mockMassGoalRegistryNotifier_, mockDistanceGoalRegistryNotifier_,
+        patient_ = new GoalIdToFlavourMap(mockMassGoalRegistryNotifier_, mockDistanceGoalRegistryNotifier_,
                 mockDurationGoalRegistryNotifier_, mockVelocityGoalRegistryNotifier_, mockCustomGoalRegistryNotifier_);
 
     }
 
     @Test
-    public void willReturnInvalidUnitForNonExistentGoalIds() {
+    public void willReturnEmptyFlavourForNonExistentGoalIds() {
         Long randomGoalId = new RandomLong().generate();
 
-        Optional<GoalUnit> actualGoalUnit = patient_.unitForGoalId(randomGoalId);
+        Optional<GoalFlavour> actualGoalFlavour = patient_.flavourForGoalId(randomGoalId);
 
-        assertFalse(actualGoalUnit.isPresent());
+        assertFalse(actualGoalFlavour.isPresent());
     }
 
     // poor man's data driven test (proper parameterized test not possible because method source must be static)
@@ -115,32 +115,32 @@ class TestGoalIdToUnitMap {
 
         listener.goalRemoved(goalId);
 
-        Optional<GoalUnit> actualGoalUnit = patient_.unitForGoalId(goalId);
-        assertFalse(actualGoalUnit.isPresent());
+        Optional<GoalFlavour> actualGoalFlavour = patient_.flavourForGoalId(goalId);
+        assertFalse(actualGoalFlavour.isPresent());
     }
 
     @Test
-    public void willReturnInvalidUnitForRemovedMassGoalId() {
+    public void willReturnEmptyFlavourForRemovedMassGoalId() {
         testRemovingGoalId(massGoalListener_);
     }
 
     @Test
-    public void willReturnInvalidUnitForRemovedDistanceGoalId() {
+    public void willReturnEmptyFlavourForRemovedDistanceGoalId() {
         testRemovingGoalId(distanceGoalListener_);
     }
 
     @Test
-    public void willReturnInvalidUnitForRemovedDurationGoalId() {
+    public void willReturnEmptyFlavourForRemovedDurationGoalId() {
         testRemovingGoalId(durationGoalListener_);
     }
 
     @Test
-    public void willReturnInvalidUnitForRemovedVelocityGoalId() {
+    public void willReturnEmptyFlavourForRemovedVelocityGoalId() {
         testRemovingGoalId(velocityGoalListener_);
     }
 
     @Test
-    public void willReturnInvalidUnitForRemovedCustomGoalId() {
+    public void willReturnEmptyFlavourForRemovedCustomGoalId() {
         testRemovingGoalId(customGoalListener_);
     }
 
@@ -157,7 +157,7 @@ class TestGoalIdToUnitMap {
     }
 
     @Test
-    public void willMapGoalIdsToCorrectUnits() {
+    public void willMapGoalIdsToCorrectFlavours() {
         ArrayList<Long> randomUniqueIds = new ArrayList<>(new RandomHashSet<>(new RandomLong()).generate(5));
         final Long massGoalId = randomUniqueIds.get(0);
         final Long distanceGoalId = randomUniqueIds.get(1);
@@ -170,47 +170,47 @@ class TestGoalIdToUnitMap {
         velocityGoalListener_.goalAdded(velocityGoalId);
         customGoalListener_.goalAdded(customGoalId);
 
-        assertPresentAndEquals(GoalUnit.MASS, patient_.unitForGoalId(massGoalId));
-        assertPresentAndEquals(GoalUnit.DISTANCE, patient_.unitForGoalId(distanceGoalId));
-        assertPresentAndEquals(GoalUnit.DURATION, patient_.unitForGoalId(durationGoalId));
-        assertPresentAndEquals(GoalUnit.VELOCITY, patient_.unitForGoalId(velocityGoalId));
-        assertPresentAndEquals(GoalUnit.CUSTOM, patient_.unitForGoalId(customGoalId));
+        assertPresentAndEquals(GoalFlavour.MASS, patient_.flavourForGoalId(massGoalId));
+        assertPresentAndEquals(GoalFlavour.DISTANCE, patient_.flavourForGoalId(distanceGoalId));
+        assertPresentAndEquals(GoalFlavour.DURATION, patient_.flavourForGoalId(durationGoalId));
+        assertPresentAndEquals(GoalFlavour.VELOCITY, patient_.flavourForGoalId(velocityGoalId));
+        assertPresentAndEquals(GoalFlavour.CUSTOM, patient_.flavourForGoalId(customGoalId));
     }
 
-    private void testMappingPreviousGoalIds(GoalUnit expectedGoalUnit, I_GoalRegistryNotifier<?> mockGoalSource) {
+    private void testMappingPreviousGoalIds(GoalFlavour expectedGoalFlavour, I_GoalRegistryNotifier<?> mockGoalSource) {
         HashSet<Long> goalIds = new RandomHashSet<>(new RandomLong()).generate();
         when(mockGoalSource.currentGoalIds()).thenReturn(goalIds);
 
         recreatePatient();
 
         for (Long goalId : goalIds) {
-            assertPresentAndEquals(expectedGoalUnit, patient_.unitForGoalId(goalId));
+            assertPresentAndEquals(expectedGoalFlavour, patient_.flavourForGoalId(goalId));
         }
     }
 
     @Test
     public void willCorrectlyMapPreviousMassGoalIds() {
-        testMappingPreviousGoalIds(GoalUnit.MASS, mockMassGoalRegistryNotifier_);
+        testMappingPreviousGoalIds(GoalFlavour.MASS, mockMassGoalRegistryNotifier_);
     }
 
     @Test
     public void willCorrectlyMapPreviousDistanceGoalIds() {
-        testMappingPreviousGoalIds(GoalUnit.DISTANCE, mockDistanceGoalRegistryNotifier_);
+        testMappingPreviousGoalIds(GoalFlavour.DISTANCE, mockDistanceGoalRegistryNotifier_);
     }
 
     @Test
     public void willCorrectlyMapPreviousDurationGoalIds() {
-        testMappingPreviousGoalIds(GoalUnit.DURATION, mockDurationGoalRegistryNotifier_);
+        testMappingPreviousGoalIds(GoalFlavour.DURATION, mockDurationGoalRegistryNotifier_);
     }
 
     @Test
     public void willCorrectlyMapPreviousVelocityGoalIds() {
-        testMappingPreviousGoalIds(GoalUnit.VELOCITY, mockVelocityGoalRegistryNotifier_);
+        testMappingPreviousGoalIds(GoalFlavour.VELOCITY, mockVelocityGoalRegistryNotifier_);
     }
 
     @Test
     public void willCorrectlyMapPreviousCustomGoalIds() {
-        testMappingPreviousGoalIds(GoalUnit.CUSTOM, mockCustomGoalRegistryNotifier_);
+        testMappingPreviousGoalIds(GoalFlavour.CUSTOM, mockCustomGoalRegistryNotifier_);
     }
 
     private <T> void assertPresentAndEquals(T expectedValue, Optional<T> actualOptional) {

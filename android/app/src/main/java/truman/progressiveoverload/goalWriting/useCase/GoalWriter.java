@@ -3,7 +3,7 @@ package truman.progressiveoverload.goalWriting.useCase;
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.GoalType;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdater;
-import truman.progressiveoverload.goalUnitMapping.useCase.api.GoalUnit;
+import truman.progressiveoverload.goalFlavours.useCase.api.GoalFlavour;
 import truman.progressiveoverload.goalWriting.useCase.api.GoalPolarity;
 import truman.progressiveoverload.goalWriting.useCase.api.I_GoalWriter;
 import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;
@@ -33,9 +33,9 @@ class GoalWriter implements I_GoalWriter {
     }
 
     @Override
-    public Long createGoal(String goalName, String goalDescription, GoalPolarity goalPolarity, GoalUnit goalUnit) {
+    public Long createGoal(String goalName, String goalDescription, GoalPolarity goalPolarity, GoalFlavour goalFlavour) {
         Long newGoalId;
-        switch (goalUnit) {
+        switch (goalFlavour) {
             case MASS:
                 GoalData<TimestampedMass> massGoalData = new GoalData<>(goalName, goalDescription, goalPolarityToGoalType(goalPolarity));
                 newGoalId = massGoalUpdater_.addGoal(massGoalData);
