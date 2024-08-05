@@ -7,11 +7,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
-import truman.progressiveoverload.measurement.mass.TimestampedMass;
 import truman.progressiveoverload.randomUtilities.RandomEnum;
 import truman.progressiveoverload.randomUtilities.RandomHashMap;
 import truman.progressiveoverload.randomUtilities.RandomLong;
@@ -237,10 +237,10 @@ class TestGoalData {
     @Test
     public void canCompareGoalDataWithDifferentTypes() {
         GoalData<Long> randomGoalData = goalDataGenerator_.generate();
-        GoalData<TimestampedMass> massBasedGoalData = new GoalData<>(randomGoalData.name(), randomGoalData.description(),
+        GoalData<Duration> durationBasedGoalData = new GoalData<>(randomGoalData.name(), randomGoalData.description(),
                 randomGoalData.goalType());
 
-        assertNotEquals(randomGoalData, massBasedGoalData);
+        assertNotEquals(randomGoalData, durationBasedGoalData);
     }
 
 
