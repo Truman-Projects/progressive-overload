@@ -3,7 +3,7 @@ package truman.progressiveoverload.goalWriting.useCase;
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.GoalType;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdater;
-import truman.progressiveoverload.goalWriting.useCase.api.GoalUnit;
+import truman.progressiveoverload.goalUnitMapping.useCase.api.GoalUnit;
 import truman.progressiveoverload.goalWriting.useCase.api.GoalPolarity;
 import truman.progressiveoverload.goalWriting.useCase.api.I_GoalWriter;
 import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;

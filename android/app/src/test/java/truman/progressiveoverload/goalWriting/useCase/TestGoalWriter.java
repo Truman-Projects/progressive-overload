@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.GoalType;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdater;
-import truman.progressiveoverload.goalWriting.useCase.api.GoalUnit;
+import truman.progressiveoverload.goalUnitMapping.useCase.api.GoalUnit;
 import truman.progressiveoverload.goalWriting.useCase.api.GoalPolarity;
 import truman.progressiveoverload.measurement.I_TimestampedValue;
 import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;
