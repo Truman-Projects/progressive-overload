@@ -6,5 +6,4 @@ public enum GoalUnit {
     DURATION,
     VELOCITY,
     CUSTOM,
-    INVALID
 }

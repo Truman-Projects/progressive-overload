@@ -1,6 +1,7 @@
 package truman.progressiveoverload.goalUnitMapping.useCase;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryNotifier;
@@ -44,8 +45,14 @@ public class GoalIdToUnitMap implements I_GoalIdToUnitMap {
     }
 
     @Override
-    public GoalUnit unitForGoalId(Long goalId) {
-        return goalIdToUnitMap_.getOrDefault(goalId, GoalUnit.INVALID);
+    public Optional<GoalUnit> unitForGoalId(Long goalId) {
+        GoalUnit unitForGoalId = goalIdToUnitMap_.get(goalId);
+        
+        if (unitForGoalId == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(unitForGoalId);
+        }
     }
 
     private class GoalRegistryListener implements I_GoalRegistryListener {

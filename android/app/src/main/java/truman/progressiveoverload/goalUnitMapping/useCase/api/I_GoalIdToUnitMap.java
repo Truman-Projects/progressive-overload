@@ -1,5 +1,7 @@
 package truman.progressiveoverload.goalUnitMapping.useCase.api;
 
+import java.util.Optional;
+
 public interface I_GoalIdToUnitMap {
-    GoalUnit unitForGoalId(Long goalId);
+    Optional<GoalUnit> unitForGoalId(Long goalId);
 }

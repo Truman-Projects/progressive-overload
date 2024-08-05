@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Optional;
 
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryNotifier;
@@ -102,9 +103,9 @@ class TestGoalIdToUnitMap {
     public void willReturnInvalidUnitForNonExistentGoalIds() {
         Long randomGoalId = new RandomLong().generate();
 
-        GoalUnit actualGoalUnit = patient_.unitForGoalId(randomGoalId);
+        Optional<GoalUnit> actualGoalUnit = patient_.unitForGoalId(randomGoalId);
 
-        assertEquals(GoalUnit.INVALID, actualGoalUnit);
+        assertFalse(actualGoalUnit.isPresent());
     }
 
     // poor man's data driven test (proper parameterized test not possible because method source must be static)
@@ -114,7 +115,8 @@ class TestGoalIdToUnitMap {
 
         listener.goalRemoved(goalId);
 
-        assertEquals(GoalUnit.INVALID, patient_.unitForGoalId(goalId));
+        Optional<GoalUnit> actualGoalUnit = patient_.unitForGoalId(goalId);
+        assertFalse(actualGoalUnit.isPresent());
     }
 
     @Test
@@ -168,11 +170,11 @@ class TestGoalIdToUnitMap {
         velocityGoalListener_.goalAdded(velocityGoalId);
         customGoalListener_.goalAdded(customGoalId);
 
-        assertEquals(GoalUnit.MASS, patient_.unitForGoalId(massGoalId));
-        assertEquals(GoalUnit.DISTANCE, patient_.unitForGoalId(distanceGoalId));
-        assertEquals(GoalUnit.DURATION, patient_.unitForGoalId(durationGoalId));
-        assertEquals(GoalUnit.VELOCITY, patient_.unitForGoalId(velocityGoalId));
-        assertEquals(GoalUnit.CUSTOM, patient_.unitForGoalId(customGoalId));
+        assertPresentAndEquals(GoalUnit.MASS, patient_.unitForGoalId(massGoalId));
+        assertPresentAndEquals(GoalUnit.DISTANCE, patient_.unitForGoalId(distanceGoalId));
+        assertPresentAndEquals(GoalUnit.DURATION, patient_.unitForGoalId(durationGoalId));
+        assertPresentAndEquals(GoalUnit.VELOCITY, patient_.unitForGoalId(velocityGoalId));
+        assertPresentAndEquals(GoalUnit.CUSTOM, patient_.unitForGoalId(customGoalId));
     }
 
     private void testMappingPreviousGoalIds(GoalUnit expectedGoalUnit, I_GoalRegistryNotifier<?> mockGoalSource) {
@@ -182,7 +184,7 @@ class TestGoalIdToUnitMap {
         recreatePatient();
 
         for (Long goalId : goalIds) {
-            assertEquals(expectedGoalUnit, patient_.unitForGoalId(goalId));
+            assertPresentAndEquals(expectedGoalUnit, patient_.unitForGoalId(goalId));
         }
     }
 
@@ -209,5 +211,10 @@ class TestGoalIdToUnitMap {
     @Test
     public void willCorrectlyMapPreviousCustomGoalIds() {
         testMappingPreviousGoalIds(GoalUnit.CUSTOM, mockCustomGoalRegistryNotifier_);
+    }
+
+    private <T> void assertPresentAndEquals(T expectedValue, Optional<T> actualOptional) {
+        assertTrue(actualOptional.isPresent());
+        assertEquals(expectedValue, actualOptional.get());
     }
 }
