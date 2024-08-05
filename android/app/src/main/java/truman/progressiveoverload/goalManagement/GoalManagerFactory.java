@@ -1,10 +1,9 @@
 package truman.progressiveoverload.goalManagement;
 
 import truman.progressiveoverload.goalManagement.api.GoalData;
-import truman.progressiveoverload.measurement.I_TimestampedValue;
 
-class GoalManagerFactory<TimestampedType extends I_TimestampedValue> implements I_GoalManagerFactory<TimestampedType> {
-    public I_GoalManager<TimestampedType> createGoalManager(GoalData<TimestampedType> initialState) {
+class GoalManagerFactory<GoalFlavour> implements I_GoalManagerFactory<GoalFlavour> {
+    public I_GoalManager<GoalFlavour> createGoalManager(GoalData<GoalFlavour> initialState) {
         return new GoalManager<>(initialState);
     }
 

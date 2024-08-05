@@ -1,5 +1,6 @@
 package truman.progressiveoverload.goalFlavours.useCase;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -7,20 +8,18 @@ import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryNotifier;
 import truman.progressiveoverload.goalFlavours.useCase.api.GoalFlavour;
 import truman.progressiveoverload.goalFlavours.useCase.api.I_GoalIdToFlavourMap;
-import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;
-import truman.progressiveoverload.measurement.distance.TimestampedDistance;
-import truman.progressiveoverload.measurement.duration.TimestampedDuration;
-import truman.progressiveoverload.measurement.mass.TimestampedMass;
-import truman.progressiveoverload.measurement.velocity.TimestampedVelocity;
+import truman.progressiveoverload.measurement.distance.Distance;
+import truman.progressiveoverload.measurement.mass.Mass;
+import truman.progressiveoverload.measurement.velocity.Velocity;
 
 public class GoalIdToFlavourMap implements I_GoalIdToFlavourMap {
     private final HashMap<Long, GoalFlavour> goalIdToFlavourMap_;
 
-    public GoalIdToFlavourMap(I_GoalRegistryNotifier<TimestampedMass> massGoalSource,
-                              I_GoalRegistryNotifier<TimestampedDistance> distanceGoalSource,
-                              I_GoalRegistryNotifier<TimestampedDuration> durationGoalSource,
-                              I_GoalRegistryNotifier<TimestampedVelocity> velocityGoalSource,
-                              I_GoalRegistryNotifier<TimestampedCustomValue> customGoalSource) {
+    public GoalIdToFlavourMap(I_GoalRegistryNotifier<Mass> massGoalSource,
+                              I_GoalRegistryNotifier<Distance> distanceGoalSource,
+                              I_GoalRegistryNotifier<Duration> durationGoalSource,
+                              I_GoalRegistryNotifier<Velocity> velocityGoalSource,
+                              I_GoalRegistryNotifier<Double> customGoalSource) {
         goalIdToFlavourMap_ = new HashMap<>();
         for (Long massGoalId : massGoalSource.currentGoalIds()) {
             goalIdToFlavourMap_.put(massGoalId, GoalFlavour.MASS);

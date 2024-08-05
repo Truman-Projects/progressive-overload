@@ -2,19 +2,17 @@ package truman.progressiveoverload.goalManagement.api;
 
 import java.util.HashMap;
 
-import truman.progressiveoverload.measurement.I_TimestampedValue;
-
 // MUST REMAIN IMMUTABLE
-public final class GoalData<TimestampedType extends I_TimestampedValue> {
+public final class GoalData<GoalFlavour> {
 
     private final String name_; // Should never be changed.  Each Goal's name acts as its primary key
     private final String description_;
     private final GoalType goalType_;
-    private final HashMap<Long, TimestampedType> recordsById_;
-    private final HashMap<Long, TimestampedType> targetMilestonesById_;
+    private final HashMap<Long, TimestampedValue<GoalFlavour>> recordsById_;
+    private final HashMap<Long, TimestampedValue<GoalFlavour>> targetMilestonesById_;
 
-    public GoalData(String name, String description, GoalType goalType, HashMap<Long, TimestampedType> records, HashMap<Long,
-            TimestampedType> targetMilestones) {
+    public GoalData(String name, String description, GoalType goalType, HashMap<Long, TimestampedValue<GoalFlavour>> records, HashMap<Long,
+            TimestampedValue<GoalFlavour>> targetMilestones) {
         name_ = name;
         description_ = description;
         goalType_ = goalType;
@@ -22,7 +20,7 @@ public final class GoalData<TimestampedType extends I_TimestampedValue> {
         targetMilestonesById_ = new HashMap<>(targetMilestones);
     }
 
-    public GoalData(String name, String description, GoalType goalType, HashMap<Long, TimestampedType> records) {
+    public GoalData(String name, String description, GoalType goalType, HashMap<Long, TimestampedValue<GoalFlavour>> records) {
         this(name, description, goalType, records, new HashMap<>());
     }
 
@@ -34,7 +32,7 @@ public final class GoalData<TimestampedType extends I_TimestampedValue> {
         return name_;
     }
 
-    public GoalData<TimestampedType> withName(String name) {
+    public GoalData<GoalFlavour> withName(String name) {
         return new GoalData<>(name, description_, goalType_, recordsById_, targetMilestonesById_);
     }
 
@@ -42,7 +40,7 @@ public final class GoalData<TimestampedType extends I_TimestampedValue> {
         return description_;
     }
 
-    public GoalData<TimestampedType> withDescription(String description) {
+    public GoalData<GoalFlavour> withDescription(String description) {
         return new GoalData<>(name_, description, goalType_, recordsById_, targetMilestonesById_);
     }
 
@@ -50,23 +48,23 @@ public final class GoalData<TimestampedType extends I_TimestampedValue> {
         return goalType_;
     }
 
-    public GoalData<TimestampedType> withGoalType(GoalType goalType) {
+    public GoalData<GoalFlavour> withGoalType(GoalType goalType) {
         return new GoalData<>(name_, description_, goalType, recordsById_, targetMilestonesById_);
     }
 
-    public HashMap<Long, TimestampedType> recordsById() {
+    public HashMap<Long, TimestampedValue<GoalFlavour>> recordsById() {
         return new HashMap<>(recordsById_);
     }
 
-    public GoalData<TimestampedType> withRecordsById(HashMap<Long, TimestampedType> records) {
+    public GoalData<GoalFlavour> withRecordsById(HashMap<Long, TimestampedValue<GoalFlavour>> records) {
         return new GoalData<>(name_, description_, goalType_, records, targetMilestonesById_);
     }
 
-    public HashMap<Long, TimestampedType> targetMilestonesById() {
+    public HashMap<Long, TimestampedValue<GoalFlavour>> targetMilestonesById() {
         return new HashMap<>(targetMilestonesById_);
     }
 
-    public GoalData<TimestampedType> withTargetMilestonesById(HashMap<Long, TimestampedType> targetMilestones) {
+    public GoalData<GoalFlavour> withTargetMilestonesById(HashMap<Long, TimestampedValue<GoalFlavour>> targetMilestones) {
         return new GoalData<>(name_, description_, goalType_, recordsById_, targetMilestones);
     }
 

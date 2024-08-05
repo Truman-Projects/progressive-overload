@@ -9,15 +9,15 @@ import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.GoalType;
 import truman.progressiveoverload.goalManagement.api.I_GoalListener;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
-import truman.progressiveoverload.measurement.I_TimestampedValue;
+import truman.progressiveoverload.goalManagement.api.TimestampedValue;
 
-class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalManager<TimestampedType> {
-    private GoalData<TimestampedType> goalData_;
+class GoalManager<GoalFlavour> implements I_GoalManager<GoalFlavour> {
+    private GoalData<GoalFlavour> goalData_;
     private Long largestRecordId_;
     private Long largestMilestoneId_;
-    private final HashSet<I_GoalListener<TimestampedType>> listeners_;
+    private final HashSet<I_GoalListener<GoalFlavour>> listeners_;
 
-    public GoalManager(GoalData<TimestampedType> data) {
+    public GoalManager(GoalData<GoalFlavour> data) {
         goalData_ = data;
 
         Set<Long> currentRecordIds = goalData_.recordsById().keySet();
@@ -31,17 +31,17 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
 
     // I_GoalUpdateNotifier
     @Override
-    public void registerListener(I_GoalListener<TimestampedType> listener) {
+    public void registerListener(I_GoalListener<GoalFlavour> listener) {
         listeners_.add(listener);
     }
 
     @Override
-    public void unregisterListener(I_GoalListener<TimestampedType> listener) {
+    public void unregisterListener(I_GoalListener<GoalFlavour> listener) {
         listeners_.remove(listener);
     }
 
     @Override
-    public GoalData<TimestampedType> currentState() {
+    public GoalData<GoalFlavour> currentState() {
         return goalData_;
     }
 
@@ -74,8 +74,8 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
     }
 
     @Override
-    public Long addRecord(TimestampedType record) {
-        HashMap<Long, TimestampedType> records = goalData_.recordsById();
+    public Long addRecord(TimestampedValue<GoalFlavour> record) {
+        HashMap<Long, TimestampedValue<GoalFlavour>> records = goalData_.recordsById();
         Long newRecordId = largestRecordId_ + 1;
         records.put(newRecordId, record);
         goalData_ = goalData_.withRecordsById(records);
@@ -88,7 +88,7 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
 
     @Override
     public void removeRecord(Long recordId) throws InvalidQueryException {
-        HashMap<Long, TimestampedType> records = goalData_.recordsById();
+        HashMap<Long, TimestampedValue<GoalFlavour>> records = goalData_.recordsById();
         if (records.containsKey(recordId)) {
             records.remove(recordId);
             goalData_ = goalData_.withRecordsById(records);
@@ -100,8 +100,8 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
     }
 
     @Override
-    public void editRecord(Long recordId, TimestampedType updatedRecord) throws InvalidQueryException {
-        HashMap<Long, TimestampedType> records = goalData_.recordsById();
+    public void editRecord(Long recordId, TimestampedValue<GoalFlavour> updatedRecord) throws InvalidQueryException {
+        HashMap<Long, TimestampedValue<GoalFlavour>> records = goalData_.recordsById();
         if (records.containsKey(recordId)) {
             records.remove(recordId);
             records.put(recordId, updatedRecord);
@@ -114,8 +114,8 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
     }
 
     @Override
-    public Long addTargetMilestone(TimestampedType targetMilestone) {
-        HashMap<Long, TimestampedType> milestones = goalData_.targetMilestonesById();
+    public Long addTargetMilestone(TimestampedValue<GoalFlavour> targetMilestone) {
+        HashMap<Long, TimestampedValue<GoalFlavour>> milestones = goalData_.targetMilestonesById();
         Long newMilestoneId = largestMilestoneId_ + 1;
         milestones.put(newMilestoneId, targetMilestone);
         goalData_ = goalData_.withTargetMilestonesById(milestones);
@@ -127,7 +127,7 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
 
     @Override
     public void removeTargetMilestone(Long milestoneId) throws InvalidQueryException {
-        HashMap<Long, TimestampedType> milestones = goalData_.targetMilestonesById();
+        HashMap<Long, TimestampedValue<GoalFlavour>> milestones = goalData_.targetMilestonesById();
         if (milestones.containsKey(milestoneId)) {
             milestones.remove(milestoneId);
             goalData_ = goalData_.withTargetMilestonesById(milestones);
@@ -140,8 +140,8 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
     }
 
     @Override
-    public void editTargetMilestone(Long milestoneId, TimestampedType updatedMilestone) throws InvalidQueryException {
-        HashMap<Long, TimestampedType> milestones = goalData_.targetMilestonesById();
+    public void editTargetMilestone(Long milestoneId, TimestampedValue<GoalFlavour> updatedMilestone) throws InvalidQueryException {
+        HashMap<Long, TimestampedValue<GoalFlavour>> milestones = goalData_.targetMilestonesById();
         if (milestones.containsKey(milestoneId)) {
             milestones.remove(milestoneId);
             milestones.put(milestoneId, updatedMilestone);
@@ -153,12 +153,12 @@ class GoalManager<TimestampedType extends I_TimestampedValue> implements I_GoalM
         }
     }
 
-    private interface NotifyListenersLambda<T extends I_TimestampedValue> {
+    private interface NotifyListenersLambda<T> {
         void notify(I_GoalListener<T> listener);
     }
 
-    private void notifyAllListeners(NotifyListenersLambda<TimestampedType> notifyFunction) {
-        for (I_GoalListener<TimestampedType> listener : listeners_) {
+    private void notifyAllListeners(NotifyListenersLambda<GoalFlavour> notifyFunction) {
+        for (I_GoalListener<GoalFlavour> listener : listeners_) {
             notifyFunction.notify(listener);
         }
     }

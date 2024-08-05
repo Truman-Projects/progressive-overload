@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
@@ -19,29 +20,27 @@ import java.util.Optional;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryNotifier;
 import truman.progressiveoverload.goalFlavours.useCase.api.GoalFlavour;
-import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;
-import truman.progressiveoverload.measurement.distance.TimestampedDistance;
-import truman.progressiveoverload.measurement.duration.TimestampedDuration;
-import truman.progressiveoverload.measurement.mass.TimestampedMass;
-import truman.progressiveoverload.measurement.velocity.TimestampedVelocity;
+import truman.progressiveoverload.measurement.distance.Distance;
+import truman.progressiveoverload.measurement.mass.Mass;
+import truman.progressiveoverload.measurement.velocity.Velocity;
 import truman.progressiveoverload.randomUtilities.RandomHashSet;
 import truman.progressiveoverload.randomUtilities.RandomLong;
 
 class TestGoalIdToFlavourMap {
 
-    private interface I_MassGoalRegistryNotifier extends I_GoalRegistryNotifier<TimestampedMass> {
+    private interface I_MassGoalRegistryNotifier extends I_GoalRegistryNotifier<Mass> {
     }
 
-    private interface I_DistanceGoalRegistryNotifier extends I_GoalRegistryNotifier<TimestampedDistance> {
+    private interface I_DistanceGoalRegistryNotifier extends I_GoalRegistryNotifier<Distance> {
     }
 
-    private interface I_DurationGoalRegistryNotifier extends I_GoalRegistryNotifier<TimestampedDuration> {
+    private interface I_DurationGoalRegistryNotifier extends I_GoalRegistryNotifier<Duration> {
     }
 
-    private interface I_VelocityGoalRegistryNotifier extends I_GoalRegistryNotifier<TimestampedVelocity> {
+    private interface I_VelocityGoalRegistryNotifier extends I_GoalRegistryNotifier<Velocity> {
     }
 
-    private interface I_CustomGoalRegistryNotifier extends I_GoalRegistryNotifier<TimestampedCustomValue> {
+    private interface I_CustomGoalRegistryNotifier extends I_GoalRegistryNotifier<Double> {
     }
 
     private I_MassGoalRegistryNotifier mockMassGoalRegistryNotifier_;

@@ -1,27 +1,27 @@
 package truman.progressiveoverload.goalManagement;
 
 
+import java.time.Duration;
+
 import truman.progressiveoverload.goalManagement.api.I_GoalDataPersistenceSource;
 import truman.progressiveoverload.goalManagement.api.I_GoalManagementContainer;
-import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;
-import truman.progressiveoverload.measurement.distance.TimestampedDistance;
-import truman.progressiveoverload.measurement.duration.TimestampedDuration;
-import truman.progressiveoverload.measurement.mass.TimestampedMass;
-import truman.progressiveoverload.measurement.velocity.TimestampedVelocity;
+import truman.progressiveoverload.measurement.distance.Distance;
+import truman.progressiveoverload.measurement.mass.Mass;
+import truman.progressiveoverload.measurement.velocity.Velocity;
 
 public class GoalManagementContainer implements I_GoalManagementContainer {
     private final UniqueIdSource idSource_;
-    private final GoalManagementModule<TimestampedMass> massModule_;
-    private final GoalManagementModule<TimestampedDistance> distanceModule_;
-    private final GoalManagementModule<TimestampedDuration> durationModule_;
-    private final GoalManagementModule<TimestampedVelocity> velocityModule_;
-    private final GoalManagementModule<TimestampedCustomValue> customUnitModule_;
+    private final GoalManagementModule<Mass> massModule_;
+    private final GoalManagementModule<Distance> distanceModule_;
+    private final GoalManagementModule<Duration> durationModule_;
+    private final GoalManagementModule<Velocity> velocityModule_;
+    private final GoalManagementModule<Double> customUnitModule_;
 
-    public GoalManagementContainer(I_GoalDataPersistenceSource<TimestampedMass> persistenceSourceForMassGoals,
-                                   I_GoalDataPersistenceSource<TimestampedDistance> persistenceSourceForDistanceGoals,
-                                   I_GoalDataPersistenceSource<TimestampedDuration> persistenceSourceForDurationGoals,
-                                   I_GoalDataPersistenceSource<TimestampedVelocity> persistenceSourceForVelocityGoals,
-                                   I_GoalDataPersistenceSource<TimestampedCustomValue> persistenceSourceForCustomGoals) {
+    public GoalManagementContainer(I_GoalDataPersistenceSource<Mass> persistenceSourceForMassGoals,
+                                   I_GoalDataPersistenceSource<Distance> persistenceSourceForDistanceGoals,
+                                   I_GoalDataPersistenceSource<Duration> persistenceSourceForDurationGoals,
+                                   I_GoalDataPersistenceSource<Velocity> persistenceSourceForVelocityGoals,
+                                   I_GoalDataPersistenceSource<Double> persistenceSourceForCustomGoals) {
         idSource_ = new UniqueIdSource(new RandomLongGenerator());
         massModule_ = new GoalManagementModule<>(persistenceSourceForMassGoals, idSource_);
         distanceModule_ = new GoalManagementModule<>(persistenceSourceForDistanceGoals, idSource_);
@@ -31,27 +31,27 @@ public class GoalManagementContainer implements I_GoalManagementContainer {
     }
 
     @Override
-    public GoalManagementModule<TimestampedMass> massModule() {
+    public GoalManagementModule<Mass> massModule() {
         return massModule_;
     }
 
     @Override
-    public GoalManagementModule<TimestampedDistance> distanceModule() {
+    public GoalManagementModule<Distance> distanceModule() {
         return distanceModule_;
     }
 
     @Override
-    public GoalManagementModule<TimestampedDuration> durationModule() {
+    public GoalManagementModule<Duration> durationModule() {
         return durationModule_;
     }
 
     @Override
-    public GoalManagementModule<TimestampedVelocity> velocityModule() {
+    public GoalManagementModule<Velocity> velocityModule() {
         return velocityModule_;
     }
 
     @Override
-    public GoalManagementModule<TimestampedCustomValue> customUnitModule() {
+    public GoalManagementModule<Double> customUnitModule() {
         return customUnitModule_;
     }
 

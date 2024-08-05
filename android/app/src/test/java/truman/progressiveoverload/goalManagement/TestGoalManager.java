@@ -23,8 +23,8 @@ import truman.progressiveoverload.goalManagement.api.GoalType;
 import truman.progressiveoverload.goalManagement.api.I_GoalListener;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
-import truman.progressiveoverload.measurement.fake.FakeTimestampedValue;
-import truman.progressiveoverload.measurement.fake.RandomFakeTimestampedValue;
+import truman.progressiveoverload.goalManagement.api.RandomTimestampedValue;
+import truman.progressiveoverload.goalManagement.api.TimestampedValue;
 import truman.progressiveoverload.randomUtilities.RandomHashMap;
 import truman.progressiveoverload.randomUtilities.RandomInt;
 import truman.progressiveoverload.randomUtilities.RandomLong;
@@ -34,13 +34,15 @@ import truman.progressiveoverload.randomUtilities.RandomString;
 class TestGoalManager {
 
     // intermediate interface to appease the mockito gods
-    private interface I_FakeValueGoalListener extends I_GoalListener<FakeTimestampedValue> {
+    private interface I_FakeValueGoalListener extends I_GoalListener<Long> {
     }
 
-    private static final RandomGoalData<FakeTimestampedValue> goalDataGen_ = new RandomGoalData<>(new RandomFakeTimestampedValue());
+    private static final RandomLong longGenerator_ = new RandomLong();
+    private static final RandomGoalData<Long> goalDataGen_ = new RandomGoalData<>(longGenerator_);
+    private static final RandomTimestampedValue<Long> timestampedLongGenerator_ = new RandomTimestampedValue<>(longGenerator_);
     private I_FakeValueGoalListener[] listenerList_;
-    private GoalData<FakeTimestampedValue> initialGoalData_;
-    private GoalManager<FakeTimestampedValue> patient_;
+    private GoalData<Long> initialGoalData_;
+    private GoalManager<Long> patient_;
 
     @BeforeEach
     public void resetEverything() {
@@ -65,7 +67,7 @@ class TestGoalManager {
     @Test
     public void willProvideUpdatedCurrentStateAfterChangingName() {
         String newName = new RandomOther<>(new RandomString()).otherThan(initialGoalData_.name());
-        GoalData<FakeTimestampedValue> goalDataWithNewName = initialGoalData_.withName(newName);
+        GoalData<Long> goalDataWithNewName = initialGoalData_.withName(newName);
 
         patient_.changeGoalName(newName);
 
@@ -75,7 +77,7 @@ class TestGoalManager {
     @Test
     public void willProvideUpdatedCurrentStateAfterChangingDescription() {
         String newDescription = new RandomOther<>(new RandomString()).otherThan(initialGoalData_.description());
-        GoalData<FakeTimestampedValue> goalDataWithNewDescription = initialGoalData_.withDescription(newDescription);
+        GoalData<Long> goalDataWithNewDescription = initialGoalData_.withDescription(newDescription);
 
         patient_.changeGoalDescription(newDescription);
 
@@ -87,7 +89,7 @@ class TestGoalManager {
     public void willProvideUpdatedCurrentStateAfterChangingGoalType(GoalType initialGoalType, GoalType newGoalType) {
         initialGoalData_ = initialGoalData_.withGoalType(initialGoalType);
         resetPatient();
-        GoalData<FakeTimestampedValue> goalDataWithNewGoalType = initialGoalData_.withGoalType(newGoalType);
+        GoalData<Long> goalDataWithNewGoalType = initialGoalData_.withGoalType(newGoalType);
 
         patient_.changeGoalType(newGoalType);
 
@@ -106,40 +108,38 @@ class TestGoalManager {
 
     @Test
     public void willProvideUpdatedCurrentStateAfterAddingRecord() {
-        FakeTimestampedValue newRecord = new RandomFakeTimestampedValue().generate();
-        HashMap<Long, FakeTimestampedValue> initialRecords = initialGoalData_.recordsById();
+        TimestampedValue<Long> newRecord = timestampedLongGenerator_.generate();
+        HashMap<Long, TimestampedValue<Long>> initialRecords = initialGoalData_.recordsById();
 
         Long newRecordId = patient_.addRecord(newRecord);
 
-        HashMap<Long, FakeTimestampedValue> expectedRecords = new HashMap<>(initialRecords);
+        HashMap<Long, TimestampedValue<Long>> expectedRecords = new HashMap<>(initialRecords);
         expectedRecords.put(newRecordId, newRecord);
-        GoalData<FakeTimestampedValue> goalDataWithExpectedRecords = initialGoalData_.withRecordsById(expectedRecords);
+        GoalData<Long> goalDataWithExpectedRecords = initialGoalData_.withRecordsById(expectedRecords);
         assertEquals(goalDataWithExpectedRecords, patient_.currentState());
     }
 
     @Test
     public void willProvideUpdatedCurrentStateAfterAddingMilestone() {
-        FakeTimestampedValue newMilestone = new RandomFakeTimestampedValue().generate();
-        HashMap<Long, FakeTimestampedValue> initialMilestones = initialGoalData_.targetMilestonesById();
+        TimestampedValue<Long> newMilestone = timestampedLongGenerator_.generate();
+        HashMap<Long, TimestampedValue<Long>> initialMilestones = initialGoalData_.targetMilestonesById();
 
         Long newMilestoneId = patient_.addTargetMilestone(newMilestone);
 
-        HashMap<Long, FakeTimestampedValue> expectedMilestones = new HashMap<>(initialMilestones);
+        HashMap<Long, TimestampedValue<Long>> expectedMilestones = new HashMap<>(initialMilestones);
         expectedMilestones.put(newMilestoneId, newMilestone);
-        GoalData<FakeTimestampedValue> goalDataWithExpectedMilestones = initialGoalData_.withTargetMilestonesById(expectedMilestones);
+        GoalData<Long> goalDataWithExpectedMilestones = initialGoalData_.withTargetMilestonesById(expectedMilestones);
         assertEquals(goalDataWithExpectedMilestones, patient_.currentState());
     }
 
     @ParameterizedTest
     @MethodSource("idOrderingTestData")
-    public void willGenerateRecordIdsInIncreasingOrder(HashMap<Long, FakeTimestampedValue> initialMap, int numberOfEntriesToAdd,
+    public void willGenerateRecordIdsInIncreasingOrder(HashMap<Long, TimestampedValue<Long>> initialMap, int numberOfEntriesToAdd,
                                                        Set<Long> expectedIds) {
         initialGoalData_ = initialGoalData_.withRecordsById(initialMap);
         resetPatient();
-        RandomFakeTimestampedValue valueGenerator = new RandomFakeTimestampedValue();
-
         for (int recordsAdded = 0; recordsAdded < numberOfEntriesToAdd; recordsAdded++) {
-            FakeTimestampedValue randomValue = valueGenerator.generate();
+            TimestampedValue<Long> randomValue = timestampedLongGenerator_.generate();
             patient_.addRecord(randomValue);
         }
 
@@ -149,14 +149,12 @@ class TestGoalManager {
 
     @ParameterizedTest
     @MethodSource("idOrderingTestData")
-    public void willGenerateMilestoneIdsInIncreasingOrder(HashMap<Long, FakeTimestampedValue> initialMap, int numberOfEntriesToAdd,
+    public void willGenerateMilestoneIdsInIncreasingOrder(HashMap<Long, TimestampedValue<Long>> initialMap, int numberOfEntriesToAdd,
                                                           Set<Long> expectedIds) {
         initialGoalData_ = initialGoalData_.withTargetMilestonesById(initialMap);
         resetPatient();
-        RandomFakeTimestampedValue valueGenerator = new RandomFakeTimestampedValue();
-
         for (int milestonesAdded = 0; milestonesAdded < numberOfEntriesToAdd; milestonesAdded++) {
-            FakeTimestampedValue randomValue = valueGenerator.generate();
+            TimestampedValue<Long> randomValue = timestampedLongGenerator_.generate();
             patient_.addTargetMilestone(randomValue);
         }
 
@@ -166,7 +164,7 @@ class TestGoalManager {
 
     @Test
     public void willProvideUpdatedCurrentStateAfterRemovingValidRecord() {
-        HashMap<Long, FakeTimestampedValue> initialRecords = initialGoalData_.recordsById();
+        HashMap<Long, TimestampedValue<Long>> initialRecords = initialGoalData_.recordsById();
         Long recordIdToRemove = pickRandomEntryIdFromMap(initialRecords);
 
         try {
@@ -174,15 +172,15 @@ class TestGoalManager {
         } catch (InvalidQueryException ignore) {
         }
 
-        HashMap<Long, FakeTimestampedValue> expectedRecords = new HashMap<>(initialRecords);
+        HashMap<Long, TimestampedValue<Long>> expectedRecords = new HashMap<>(initialRecords);
         expectedRecords.remove(recordIdToRemove);
-        GoalData<FakeTimestampedValue> goalDataWithExpectedRecords = initialGoalData_.withRecordsById(expectedRecords);
+        GoalData<Long> goalDataWithExpectedRecords = initialGoalData_.withRecordsById(expectedRecords);
         assertEquals(goalDataWithExpectedRecords, patient_.currentState());
     }
 
     @Test
     public void willProvideUpdatedCurrentStateAfterRemovingValidMilestone() {
-        HashMap<Long, FakeTimestampedValue> initialMilestones = initialGoalData_.targetMilestonesById();
+        HashMap<Long, TimestampedValue<Long>> initialMilestones = initialGoalData_.targetMilestonesById();
         Long milestoneIdToRemove = pickRandomEntryIdFromMap(initialMilestones);
 
         try {
@@ -190,9 +188,9 @@ class TestGoalManager {
         } catch (InvalidQueryException ignore) {
         }
 
-        HashMap<Long, FakeTimestampedValue> expectedMilestones = new HashMap<>(initialMilestones);
+        HashMap<Long, TimestampedValue<Long>> expectedMilestones = new HashMap<>(initialMilestones);
         expectedMilestones.remove(milestoneIdToRemove);
-        GoalData<FakeTimestampedValue> goalDataWithExpectedMilestones = initialGoalData_.withTargetMilestonesById(expectedMilestones);
+        GoalData<Long> goalDataWithExpectedMilestones = initialGoalData_.withTargetMilestonesById(expectedMilestones);
         assertEquals(goalDataWithExpectedMilestones, patient_.currentState());
     }
 
@@ -214,14 +212,13 @@ class TestGoalManager {
     public void willNotReuseRemovedRecordIds() {
         initialGoalData_ = initialGoalData_.withRecordsById(new HashMap<>());
         resetPatient();
-        RandomFakeTimestampedValue valueGen = new RandomFakeTimestampedValue();
-        Long firstRecordId = patient_.addRecord(valueGen.generate());
+        Long firstRecordId = patient_.addRecord(timestampedLongGenerator_.generate());
         try {
             patient_.removeRecord(firstRecordId);
         } catch (InvalidQueryException ignore) {
         }
 
-        Long secondRecordId = patient_.addRecord(valueGen.generate());
+        Long secondRecordId = patient_.addRecord(timestampedLongGenerator_.generate());
 
         assertNotEquals(firstRecordId, secondRecordId);
     }
@@ -230,24 +227,23 @@ class TestGoalManager {
     public void willNotReuseRemovedMilestoneIds() {
         initialGoalData_ = initialGoalData_.withTargetMilestonesById(new HashMap<>());
         resetPatient();
-        RandomFakeTimestampedValue valueGen = new RandomFakeTimestampedValue();
-        Long firstMilestoneId = patient_.addTargetMilestone(valueGen.generate());
+        Long firstMilestoneId = patient_.addTargetMilestone(timestampedLongGenerator_.generate());
         try {
             patient_.removeTargetMilestone(firstMilestoneId);
         } catch (InvalidQueryException ignore) {
         }
 
-        Long secondMilestoneId = patient_.addTargetMilestone(valueGen.generate());
+        Long secondMilestoneId = patient_.addTargetMilestone(timestampedLongGenerator_.generate());
 
         assertNotEquals(firstMilestoneId, secondMilestoneId);
     }
 
     @Test
     public void willProvideCorrectCurrentStateAfterEditingRecord() {
-        HashMap<Long, FakeTimestampedValue> initialRecords = initialGoalData_.recordsById();
+        HashMap<Long, TimestampedValue<Long>> initialRecords = initialGoalData_.recordsById();
         Long recordIdToEdit = pickRandomEntryIdFromMap(initialRecords);
-        FakeTimestampedValue recordAfterEditing =
-                new RandomOther<>(new RandomFakeTimestampedValue()).otherThan(new ArrayList<>(initialRecords.values()));
+        TimestampedValue<Long> recordAfterEditing =
+                new RandomOther<>(timestampedLongGenerator_).otherThan(new ArrayList<>(initialRecords.values()));
 
         try {
             patient_.editRecord(recordIdToEdit, recordAfterEditing);
@@ -259,10 +255,10 @@ class TestGoalManager {
 
     @Test
     public void willProvideCorrectCurrentStateAfterEditingMilestone() {
-        HashMap<Long, FakeTimestampedValue> initialMilestones = initialGoalData_.targetMilestonesById();
+        HashMap<Long, TimestampedValue<Long>> initialMilestones = initialGoalData_.targetMilestonesById();
         Long milestoneIdToEdit = pickRandomEntryIdFromMap(initialMilestones);
-        FakeTimestampedValue milestoneAfterEditing =
-                new RandomOther<>(new RandomFakeTimestampedValue()).otherThan(new ArrayList<>(initialMilestones.values()));
+        TimestampedValue<Long> milestoneAfterEditing =
+                new RandomOther<>(timestampedLongGenerator_).otherThan(new ArrayList<>(initialMilestones.values()));
 
         try {
             patient_.editTargetMilestone(milestoneIdToEdit, milestoneAfterEditing);
@@ -275,7 +271,7 @@ class TestGoalManager {
     @Test
     public void willThrowExceptionWhenAttemptingToEditInvalidRecordId() {
         Long invalidRecordId = pickRandomEntryIdNotInMap(initialGoalData_.recordsById());
-        FakeTimestampedValue randomUpdatedRecord = new RandomFakeTimestampedValue().generate();
+        TimestampedValue<Long> randomUpdatedRecord = timestampedLongGenerator_.generate();
 
         assertThrows(InvalidQueryException.class, () -> patient_.editRecord(invalidRecordId, randomUpdatedRecord));
     }
@@ -283,7 +279,7 @@ class TestGoalManager {
     @Test
     public void willThrowExceptionWhenAttemptingToEditInvalidMilestoneId() {
         Long invalidMilestoneId = pickRandomEntryIdNotInMap(initialGoalData_.targetMilestonesById());
-        FakeTimestampedValue randomUpdatedMilestone = new RandomFakeTimestampedValue().generate();
+        TimestampedValue<Long> randomUpdatedMilestone = timestampedLongGenerator_.generate();
 
         assertThrows(InvalidQueryException.class, () -> patient_.editTargetMilestone(invalidMilestoneId, randomUpdatedMilestone));
     }
@@ -397,7 +393,7 @@ class TestGoalManager {
 
     @Test
     public void willNotifyListenersWhenRecordAdded() {
-        FakeTimestampedValue newRecord = new RandomFakeTimestampedValue().generate();
+        TimestampedValue<Long> newRecord = timestampedLongGenerator_.generate();
         patient_.registerListener(listenerList_[0]);
         patient_.registerListener(listenerList_[1]);
 
@@ -409,7 +405,7 @@ class TestGoalManager {
 
     @Test
     public void willNotifyListenersWhenMilestoneAdded() {
-        FakeTimestampedValue newMilestone = new RandomFakeTimestampedValue().generate();
+        TimestampedValue<Long> newMilestone = timestampedLongGenerator_.generate();
         patient_.registerListener(listenerList_[0]);
         patient_.registerListener(listenerList_[1]);
 
@@ -421,7 +417,7 @@ class TestGoalManager {
 
     @ParameterizedTest
     @MethodSource("validAndInvalidHashMapIds")
-    public void willNotifyListenersWhenRecordRemoved(HashMap<Long, FakeTimestampedValue> initialRecords, Long potentiallyInvalidRecordId,
+    public void willNotifyListenersWhenRecordRemoved(HashMap<Long, TimestampedValue<Long>> initialRecords, Long potentiallyInvalidRecordId,
                                                      boolean idIsValid) {
         initialGoalData_ = initialGoalData_.withRecordsById(initialRecords);
         resetPatient();
@@ -439,7 +435,7 @@ class TestGoalManager {
 
     @ParameterizedTest
     @MethodSource("validAndInvalidHashMapIds")
-    public void willNotifyListenersWhenMilestoneRemoved(HashMap<Long, FakeTimestampedValue> initialMilestones,
+    public void willNotifyListenersWhenMilestoneRemoved(HashMap<Long, TimestampedValue<Long>> initialMilestones,
                                                         Long potentiallyInvalidMilestoneId,
                                                         boolean idIsValid) {
         initialGoalData_ = initialGoalData_.withTargetMilestonesById(initialMilestones);
@@ -458,11 +454,11 @@ class TestGoalManager {
 
     @ParameterizedTest
     @MethodSource("validAndInvalidHashMapIds")
-    public void willNotifyListenersWhenRecordChanged(HashMap<Long, FakeTimestampedValue> initialRecords, Long potentiallyInvalidRecordId,
+    public void willNotifyListenersWhenRecordChanged(HashMap<Long, TimestampedValue<Long>> initialRecords, Long potentiallyInvalidRecordId,
                                                      boolean idIsValid) {
         initialGoalData_ = initialGoalData_.withRecordsById(initialRecords);
         resetPatient();
-        FakeTimestampedValue updatedRecord = new RandomFakeTimestampedValue().generate();
+        TimestampedValue<Long> updatedRecord = timestampedLongGenerator_.generate();
         patient_.registerListener(listenerList_[0]);
         patient_.registerListener(listenerList_[1]);
 
@@ -477,12 +473,12 @@ class TestGoalManager {
 
     @ParameterizedTest
     @MethodSource("validAndInvalidHashMapIds")
-    public void willNotifyListenersWhenMilestoneChanged(HashMap<Long, FakeTimestampedValue> initialMilestones,
+    public void willNotifyListenersWhenMilestoneChanged(HashMap<Long, TimestampedValue<Long>> initialMilestones,
                                                         Long potentiallyInvalidMilestoneId,
                                                         boolean idIsValid) {
         initialGoalData_ = initialGoalData_.withTargetMilestonesById(initialMilestones);
         resetPatient();
-        FakeTimestampedValue updatedMilestone = new RandomFakeTimestampedValue().generate();
+        TimestampedValue<Long> updatedMilestone = timestampedLongGenerator_.generate();
         patient_.registerListener(listenerList_[0]);
         patient_.registerListener(listenerList_[1]);
 
@@ -495,10 +491,10 @@ class TestGoalManager {
         verify(listenerList_[1], times(idIsValid ? 1 : 0)).targetMilestoneChanged(potentiallyInvalidMilestoneId, updatedMilestone);
     }
 
-    // returns (HashMap<Long,FakeTimestampedValue> map, Long id, boolean idIsValid)
+    // returns (HashMap<Long,TimestampedValue<Long>> map, Long id, boolean idIsValid)
     private static Stream<Arguments> validAndInvalidHashMapIds() {
-        HashMap<Long, FakeTimestampedValue> initialEntries =
-                new RandomHashMap<>(new RandomLong(), new RandomFakeTimestampedValue()).generate();
+        HashMap<Long, TimestampedValue<Long>> initialEntries =
+                new RandomHashMap<>(new RandomLong(), timestampedLongGenerator_).generate();
         Long validId = pickRandomEntryIdFromMap(initialEntries);
         Long invalidId = pickRandomEntryIdNotInMap(initialEntries);
 
@@ -508,18 +504,18 @@ class TestGoalManager {
         );
     }
 
-    // returns (HashMap<Long, FakeTimestampedValue> initialMap, int numberOfEntriesToAdd, Set<Long> expectedIds)
+    // returns (HashMap<Long, TimestampedValue<Long> initialMap, int numberOfEntriesToAdd, Set<Long> expectedIds)
     private static Stream<Arguments> idOrderingTestData() {
-        RandomFakeTimestampedValue valueGenerator = new RandomFakeTimestampedValue();
+        RandomTimestampedValue<Long> valueGenerator = timestampedLongGenerator_;
 
         // case 1: adding two elements to empty hashmap
-        HashMap<Long, FakeTimestampedValue> initialMap_case1 = new HashMap<>();
+        HashMap<Long, TimestampedValue<Long>> initialMap_case1 = new HashMap<>();
         int entriesToAdd_case1 = 2;
         Long[] indexZeroAndOne = {0L, 1L};
         HashSet<Long> expectedIds_case1 = new HashSet<>(Arrays.asList(indexZeroAndOne));
 
         // case 2: adding two elements to populated hashmap
-        HashMap<Long, FakeTimestampedValue> initialMap_case2 = new HashMap<>();
+        HashMap<Long, TimestampedValue<Long>> initialMap_case2 = new HashMap<>();
         initialMap_case2.put(0L, valueGenerator.generate());
         initialMap_case2.put(1L, valueGenerator.generate());
         int entriesToAdd_case2 = 2;
@@ -527,7 +523,7 @@ class TestGoalManager {
         HashSet<Long> expectedIds_case2 = new HashSet<>(Arrays.asList(indexZeroOneTwoThree));
 
         // case 3: adding one element to out-of-order hashmap
-        HashMap<Long, FakeTimestampedValue> initialMap_case3 = new HashMap<>();
+        HashMap<Long, TimestampedValue<Long>> initialMap_case3 = new HashMap<>();
         initialMap_case3.put(0L, valueGenerator.generate());
         initialMap_case3.put(4L, valueGenerator.generate());
         int entriesToAdd_case3 = 1;
@@ -535,7 +531,7 @@ class TestGoalManager {
         HashSet<Long> expectedIds_case3 = new HashSet<>(Arrays.asList(indexZeroFourFive));
 
         // case 4: adding one element to hashmap with negative indices
-        HashMap<Long, FakeTimestampedValue> initialMap_case4 = new HashMap<>();
+        HashMap<Long, TimestampedValue<Long>> initialMap_case4 = new HashMap<>();
         initialMap_case4.put(-1L, valueGenerator.generate());
         initialMap_case4.put(0L, valueGenerator.generate());
         int entriesToAdd_case4 = 1;
@@ -551,13 +547,13 @@ class TestGoalManager {
     }
 
     // assumes non-empty map
-    private static Long pickRandomEntryIdFromMap(HashMap<Long, FakeTimestampedValue> map) {
+    private static Long pickRandomEntryIdFromMap(HashMap<Long, TimestampedValue<Long>> map) {
         ArrayList<Long> idList = new ArrayList<>(map.keySet());
         int indexOfSelectedId = new RandomInt().generate(0, idList.size() - 1);
         return idList.get(indexOfSelectedId);
     }
 
-    private static Long pickRandomEntryIdNotInMap(HashMap<Long, FakeTimestampedValue> map) {
+    private static Long pickRandomEntryIdNotInMap(HashMap<Long, TimestampedValue<Long>> map) {
         ArrayList<Long> idList = new ArrayList<>(map.keySet());
         return new RandomOther<>(new RandomLong()).otherThan(idList);
     }

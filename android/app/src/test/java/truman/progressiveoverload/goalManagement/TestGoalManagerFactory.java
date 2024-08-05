@@ -6,17 +6,16 @@ import org.junit.jupiter.api.Test;
 
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
-import truman.progressiveoverload.measurement.fake.FakeTimestampedValue;
-import truman.progressiveoverload.measurement.fake.RandomFakeTimestampedValue;
+import truman.progressiveoverload.randomUtilities.RandomLong;
 
 class TestGoalManagerFactory {
-    private final RandomGoalData<FakeTimestampedValue> goalDataGenerator_ = new RandomGoalData<>(new RandomFakeTimestampedValue());
+    private final RandomGoalData<Long> goalDataGenerator_ = new RandomGoalData<>(new RandomLong());
 
     @Test
     public void willCreateCorrectTypeOfGoalManager() {
-        GoalManagerFactory<FakeTimestampedValue> patient = new GoalManagerFactory<>();
+        GoalManagerFactory<Long> patient = new GoalManagerFactory<>();
 
-        I_GoalManager<FakeTimestampedValue> goalManager = patient.createGoalManager(goalDataGenerator_.generate());
+        I_GoalManager<Long> goalManager = patient.createGoalManager(goalDataGenerator_.generate());
 
         assertTrue(goalManager instanceof GoalManager);
 
@@ -24,10 +23,10 @@ class TestGoalManagerFactory {
 
     @Test
     public void willCreateGoalManagerWithCorrectInitialState() {
-        GoalData<FakeTimestampedValue> goalManagerInitialState = goalDataGenerator_.generate();
-        GoalManagerFactory<FakeTimestampedValue> patient = new GoalManagerFactory<>();
+        GoalData<Long> goalManagerInitialState = goalDataGenerator_.generate();
+        GoalManagerFactory<Long> patient = new GoalManagerFactory<>();
 
-        I_GoalManager<FakeTimestampedValue> goalManager = patient.createGoalManager(goalManagerInitialState);
+        I_GoalManager<Long> goalManager = patient.createGoalManager(goalManagerInitialState);
 
         assertEquals(goalManagerInitialState, goalManager.currentState());
     }

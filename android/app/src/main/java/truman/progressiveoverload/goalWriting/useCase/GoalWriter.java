@@ -1,29 +1,29 @@
 package truman.progressiveoverload.goalWriting.useCase;
 
+import java.time.Duration;
+
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.GoalType;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdater;
 import truman.progressiveoverload.goalFlavours.useCase.api.GoalFlavour;
 import truman.progressiveoverload.goalWriting.useCase.api.GoalPolarity;
 import truman.progressiveoverload.goalWriting.useCase.api.I_GoalWriter;
-import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;
-import truman.progressiveoverload.measurement.distance.TimestampedDistance;
-import truman.progressiveoverload.measurement.duration.TimestampedDuration;
-import truman.progressiveoverload.measurement.mass.TimestampedMass;
-import truman.progressiveoverload.measurement.velocity.TimestampedVelocity;
+import truman.progressiveoverload.measurement.distance.Distance;
+import truman.progressiveoverload.measurement.mass.Mass;
+import truman.progressiveoverload.measurement.velocity.Velocity;
 
 class GoalWriter implements I_GoalWriter {
-    private final I_GoalRegistryUpdater<TimestampedMass> massGoalUpdater_;
-    private final I_GoalRegistryUpdater<TimestampedDistance> distanceGoalUpdater_;
-    private final I_GoalRegistryUpdater<TimestampedDuration> durationGoalUpdater_;
-    private final I_GoalRegistryUpdater<TimestampedVelocity> velocityGoalUpdater_;
-    private final I_GoalRegistryUpdater<TimestampedCustomValue> customGoalUpdater_;
+    private final I_GoalRegistryUpdater<Mass> massGoalUpdater_;
+    private final I_GoalRegistryUpdater<Distance> distanceGoalUpdater_;
+    private final I_GoalRegistryUpdater<Duration> durationGoalUpdater_;
+    private final I_GoalRegistryUpdater<Velocity> velocityGoalUpdater_;
+    private final I_GoalRegistryUpdater<Double> customGoalUpdater_;
 
-    public GoalWriter(I_GoalRegistryUpdater<TimestampedMass> massGoalUpdater,
-                      I_GoalRegistryUpdater<TimestampedDistance> distanceGoalUpdater,
-                      I_GoalRegistryUpdater<TimestampedDuration> durationGoalUpdater,
-                      I_GoalRegistryUpdater<TimestampedVelocity> velocityGoalUpdater,
-                      I_GoalRegistryUpdater<TimestampedCustomValue> customGoalUpdater) {
+    public GoalWriter(I_GoalRegistryUpdater<Mass> massGoalUpdater,
+                      I_GoalRegistryUpdater<Distance> distanceGoalUpdater,
+                      I_GoalRegistryUpdater<Duration> durationGoalUpdater,
+                      I_GoalRegistryUpdater<Velocity> velocityGoalUpdater,
+                      I_GoalRegistryUpdater<Double> customGoalUpdater) {
         massGoalUpdater_ = massGoalUpdater;
         distanceGoalUpdater_ = distanceGoalUpdater;
         durationGoalUpdater_ = durationGoalUpdater;
@@ -37,26 +37,26 @@ class GoalWriter implements I_GoalWriter {
         Long newGoalId;
         switch (goalFlavour) {
             case MASS:
-                GoalData<TimestampedMass> massGoalData = new GoalData<>(goalName, goalDescription, goalPolarityToGoalType(goalPolarity));
+                GoalData<Mass> massGoalData = new GoalData<>(goalName, goalDescription, goalPolarityToGoalType(goalPolarity));
                 newGoalId = massGoalUpdater_.addGoal(massGoalData);
                 break;
             case DISTANCE:
-                GoalData<TimestampedDistance> distanceGoalData = new GoalData<>(goalName, goalDescription,
+                GoalData<Distance> distanceGoalData = new GoalData<>(goalName, goalDescription,
                         goalPolarityToGoalType(goalPolarity));
                 newGoalId = distanceGoalUpdater_.addGoal(distanceGoalData);
                 break;
             case DURATION:
-                GoalData<TimestampedDuration> durationGoalData = new GoalData<>(goalName, goalDescription,
+                GoalData<Duration> durationGoalData = new GoalData<>(goalName, goalDescription,
                         goalPolarityToGoalType(goalPolarity));
                 newGoalId = durationGoalUpdater_.addGoal(durationGoalData);
                 break;
             case VELOCITY:
-                GoalData<TimestampedVelocity> velocityGoalData = new GoalData<>(goalName, goalDescription,
+                GoalData<Velocity> velocityGoalData = new GoalData<>(goalName, goalDescription,
                         goalPolarityToGoalType(goalPolarity));
                 newGoalId = velocityGoalUpdater_.addGoal(velocityGoalData);
                 break;
             case CUSTOM:
-                GoalData<TimestampedCustomValue> customTypeGoalData = new GoalData<>(goalName, goalDescription,
+                GoalData<Double> customTypeGoalData = new GoalData<>(goalName, goalDescription,
                         goalPolarityToGoalType(goalPolarity));
                 newGoalId = customGoalUpdater_.addGoal(customTypeGoalData);
                 break;

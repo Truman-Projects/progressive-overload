@@ -1,11 +1,9 @@
 package truman.progressiveoverload.goalManagement.api;
 
-import truman.progressiveoverload.measurement.I_TimestampedValue;
+public interface I_GoalRegistryUpdater<GoalFlavour> {
+    I_GoalUpdater<GoalFlavour> goalUpdaterByGoalId(Long goalId) throws InvalidQueryException;
 
-public interface I_GoalRegistryUpdater<TimestampedType extends I_TimestampedValue> {
-    I_GoalUpdater<TimestampedType> goalUpdaterByGoalId(Long goalId) throws InvalidQueryException;
-
-    Long addGoal(GoalData<TimestampedType> goalData);
+    Long addGoal(GoalData<GoalFlavour> goalData);
 
     void removeGoal(Long goalId) throws InvalidQueryException;
 }

@@ -19,8 +19,6 @@ import truman.progressiveoverload.goalManagement.api.I_GoalNotifier;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
-import truman.progressiveoverload.measurement.fake.FakeTimestampedValue;
-import truman.progressiveoverload.measurement.fake.RandomFakeTimestampedValue;
 import truman.progressiveoverload.randomUtilities.RandomArrayList;
 import truman.progressiveoverload.randomUtilities.RandomHashMap;
 import truman.progressiveoverload.randomUtilities.RandomInt;
@@ -30,20 +28,20 @@ import truman.progressiveoverload.randomUtilities.RandomOther;
 class TestGoalRegistry {
     // intermediate interfaces to appease the mockito gods
 
-    private interface I_FakeValueGoalManagerFactory extends I_GoalManagerFactory<FakeTimestampedValue> {
+    private interface I_FakeValueGoalManagerFactory extends I_GoalManagerFactory<Long> {
     }
 
-    private interface I_FakeValueGoalManager extends I_GoalManager<FakeTimestampedValue> {
+    private interface I_FakeValueGoalManager extends I_GoalManager<Long> {
     }
 
 
-    private final RandomGoalData<FakeTimestampedValue> randomGoalDataGenerator_ = new RandomGoalData<>(new RandomFakeTimestampedValue());
+    private final RandomGoalData<Long> randomGoalDataGenerator_ = new RandomGoalData<>(new RandomLong());
     private I_GoalRegistryListener[] listenerList_;
-    private HashMap<Long, GoalData<FakeTimestampedValue>> goalsByIdFromPersistence_;
+    private HashMap<Long, GoalData<Long>> goalsByIdFromPersistence_;
     private I_FakeValueGoalManagerFactory goalManagerFactory_;
     private I_RandomLongGenerator rng_;
     private UniqueIdSource idSource_;
-    private GoalRegistry<FakeTimestampedValue> patient_;
+    private GoalRegistry<Long> patient_;
 
     @BeforeEach
     public void resetEverything() {
@@ -60,7 +58,7 @@ class TestGoalRegistry {
     }
 
     private void prepareMocksForGoalsFromPersistence() {
-        for (GoalData<FakeTimestampedValue> goalData : goalsByIdFromPersistence_.values()) {
+        for (GoalData<Long> goalData : goalsByIdFromPersistence_.values()) {
             prepareGoalManagerFactoryToCreateGoal(goalData);
         }
     }
@@ -85,12 +83,12 @@ class TestGoalRegistry {
     @Test
     public void willCreateGoalManagerForGoalsFromPersistence() {
         goalsByIdFromPersistence_ =
-                new RandomHashMap<>(new RandomLong(), new RandomGoalData<>(new RandomFakeTimestampedValue())).generate();
+                new RandomHashMap<>(new RandomLong(), new RandomGoalData<>(new RandomLong())).generate();
         prepareMocksForGoalsFromPersistence();
 
         recreatePatient();
 
-        for (GoalData<FakeTimestampedValue> goalDataFromPersistence : goalsByIdFromPersistence_.values()) {
+        for (GoalData<Long> goalDataFromPersistence : goalsByIdFromPersistence_.values()) {
             verify(goalManagerFactory_, times(1)).createGoalManager(goalDataFromPersistence);
         }
     }
@@ -98,14 +96,14 @@ class TestGoalRegistry {
     @Test
     public void willReturnGoalUpdaterForGoalsFromPersistence() {
         Long goalIdFromPersistence = new RandomLong().generate();
-        GoalData<FakeTimestampedValue> goalDataFromPersistence = randomGoalDataGenerator_.generate();
+        GoalData<Long> goalDataFromPersistence = randomGoalDataGenerator_.generate();
         goalsByIdFromPersistence_.put(goalIdFromPersistence, goalDataFromPersistence);
-        I_GoalUpdater<FakeTimestampedValue> expectedGoalUpdater = prepareGoalManagerFactoryToCreateGoal(goalDataFromPersistence);
+        I_GoalUpdater<Long> expectedGoalUpdater = prepareGoalManagerFactoryToCreateGoal(goalDataFromPersistence);
 
         recreatePatient();
 
         failOnException(() -> {
-            I_GoalUpdater<FakeTimestampedValue> queriedGoalUpdater = patient_.goalUpdaterByGoalId(goalIdFromPersistence);
+            I_GoalUpdater<Long> queriedGoalUpdater = patient_.goalUpdaterByGoalId(goalIdFromPersistence);
             assertSame(expectedGoalUpdater, queriedGoalUpdater);
         });
     }
@@ -114,7 +112,7 @@ class TestGoalRegistry {
     public void willNotAddGoalFromPersistenceIfIdNotAvailable() {
         Long goalIdFromPersistence = new RandomLong().generate();
         idSource_.attemptToReserveId(goalIdFromPersistence);
-        GoalData<FakeTimestampedValue> randomGoalDataFromPersistence = randomGoalDataGenerator_.generate();
+        GoalData<Long> randomGoalDataFromPersistence = randomGoalDataGenerator_.generate();
         goalsByIdFromPersistence_.put(goalIdFromPersistence, randomGoalDataFromPersistence);
 
         recreatePatient();
@@ -126,10 +124,10 @@ class TestGoalRegistry {
     @Test
     public void willReturnIdsOfAllAddedGoals() {
         int numberOfGoals = new RandomInt().generate(1, 5);
-        ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataList =
+        ArrayList<GoalData<Long>> randomGoalDataList =
                 new RandomArrayList<>(randomGoalDataGenerator_).generate(numberOfGoals);
         HashSet<Long> expectedGoalDataIDs = new HashSet<>();
-        for (GoalData<FakeTimestampedValue> goal : randomGoalDataList) {
+        for (GoalData<Long> goal : randomGoalDataList) {
             prepareGoalManagerFactoryToCreateGoal(goal);
             Long goalId = patient_.addGoal(goal);
             expectedGoalDataIDs.add(goalId);
@@ -143,9 +141,9 @@ class TestGoalRegistry {
     @Test
     public void willReserveNewGoalIdsInIdSource() {
         int numberOfGoals = new RandomInt().generate(1, 5);
-        ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataList =
+        ArrayList<GoalData<Long>> randomGoalDataList =
                 new RandomArrayList<>(randomGoalDataGenerator_).generate(numberOfGoals);
-        for (GoalData<FakeTimestampedValue> goal : randomGoalDataList) {
+        for (GoalData<Long> goal : randomGoalDataList) {
             prepareGoalManagerFactoryToCreateGoal(goal);
             patient_.addGoal(goal);
         }
@@ -162,10 +160,10 @@ class TestGoalRegistry {
     @Test
     public void willNotReturnIDsOfRemovedGoals() {
         final int NUMBER_OF_GOALS = 5;
-        ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataList =
+        ArrayList<GoalData<Long>> randomGoalDataList =
                 new RandomArrayList<>(randomGoalDataGenerator_).generate(NUMBER_OF_GOALS);
         HashSet<Long> goalIDs = new HashSet<>();
-        for (GoalData<FakeTimestampedValue> goal : randomGoalDataList) {
+        for (GoalData<Long> goal : randomGoalDataList) {
             prepareGoalManagerFactoryToCreateGoal(goal);
             Long goalID = patient_.addGoal(goal);
             goalIDs.add(goalID);
@@ -192,7 +190,7 @@ class TestGoalRegistry {
 
     @Test
     public void willCallCreateGoalManagerWhenAddingGoal() {
-        GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
+        GoalData<Long> randomGoalData = randomGoalDataGenerator_.generate();
         prepareGoalManagerFactoryToCreateGoal(randomGoalData);
 
         patient_.addGoal(randomGoalData);
@@ -202,8 +200,8 @@ class TestGoalRegistry {
 
     @Test
     public void willNotReuseRemovedGoalIds() {
-        GoalData<FakeTimestampedValue> randomGoal1 = randomGoalDataGenerator_.generate();
-        GoalData<FakeTimestampedValue> randomGoal2 = randomGoalDataGenerator_.generate();
+        GoalData<Long> randomGoal1 = randomGoalDataGenerator_.generate();
+        GoalData<Long> randomGoal2 = randomGoalDataGenerator_.generate();
         Long firstGoalId = patient_.addGoal(randomGoal1);
         failOnException(() -> patient_.removeGoal(firstGoalId));
 
@@ -216,12 +214,12 @@ class TestGoalRegistry {
     @Test
     public void willReturnCorrectGoalUpdateNotifier() {
         injectRandomGoalsIntoPatient();
-        GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
-        I_GoalManager<FakeTimestampedValue> mockGoalManager = prepareGoalManagerFactoryToCreateGoal(randomGoalData);
+        GoalData<Long> randomGoalData = randomGoalDataGenerator_.generate();
+        I_GoalManager<Long> mockGoalManager = prepareGoalManagerFactoryToCreateGoal(randomGoalData);
         Long goalId = patient_.addGoal(randomGoalData);
 
         try {
-            I_GoalNotifier<FakeTimestampedValue> retrievedUpdateNotifier = patient_.goalUpdateNotifierByGoalId(goalId);
+            I_GoalNotifier<Long> retrievedUpdateNotifier = patient_.goalUpdateNotifierByGoalId(goalId);
             assertSame(mockGoalManager, retrievedUpdateNotifier);
         } catch (InvalidQueryException e) {
             fail("Caught unexpected exception");
@@ -239,12 +237,12 @@ class TestGoalRegistry {
     @Test
     public void willReturnCorrectGoalUpdater() {
         injectRandomGoalsIntoPatient();
-        GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
-        I_GoalManager<FakeTimestampedValue> mockGoalManager = prepareGoalManagerFactoryToCreateGoal(randomGoalData);
+        GoalData<Long> randomGoalData = randomGoalDataGenerator_.generate();
+        I_GoalManager<Long> mockGoalManager = prepareGoalManagerFactoryToCreateGoal(randomGoalData);
         Long goalId = patient_.addGoal(randomGoalData);
 
         failOnException(() -> {
-            I_GoalUpdater<FakeTimestampedValue> retrievedGoalUpdater = patient_.goalUpdaterByGoalId(goalId);
+            I_GoalUpdater<Long> retrievedGoalUpdater = patient_.goalUpdaterByGoalId(goalId);
             assertSame(mockGoalManager, retrievedGoalUpdater);
         });
     }
@@ -261,7 +259,7 @@ class TestGoalRegistry {
     public void willDoNothingWhenRegisteringSameListenerSecondTime() {
         patient_.registerListener(listenerList_[0]);
         patient_.registerListener(listenerList_[0]);
-        GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
+        GoalData<Long> randomGoalData = randomGoalDataGenerator_.generate();
 
         Long goalId = patient_.addGoal(randomGoalData);
 
@@ -271,7 +269,7 @@ class TestGoalRegistry {
 
     @Test
     public void willNotifyListenersWhenGoalSuccessfullyAdded() {
-        GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
+        GoalData<Long> randomGoalData = randomGoalDataGenerator_.generate();
         prepareGoalManagerFactoryToCreateGoal(randomGoalData);
         patient_.registerListener(listenerList_[0]);
         patient_.registerListener(listenerList_[1]);
@@ -285,7 +283,7 @@ class TestGoalRegistry {
 
     @Test
     public void willOnlyNotifyListenersWhenGoalSuccessfullyRemoved() {
-        GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
+        GoalData<Long> randomGoalData = randomGoalDataGenerator_.generate();
         prepareGoalManagerFactoryToCreateGoal(randomGoalData);
         patient_.registerListener(listenerList_[0]);
         patient_.registerListener(listenerList_[1]);
@@ -301,7 +299,7 @@ class TestGoalRegistry {
 
     @Test
     public void willNotNotifyUnregisteredListener() {
-        GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
+        GoalData<Long> randomGoalData = randomGoalDataGenerator_.generate();
         prepareGoalManagerFactoryToCreateGoal(randomGoalData);
         patient_.registerListener(listenerList_[0]);
         patient_.unregisterListener(listenerList_[0]);
@@ -314,7 +312,7 @@ class TestGoalRegistry {
 
     @Test
     public void willOnlyUnregisterRequestedListener() {
-        GoalData<FakeTimestampedValue> randomGoalData = randomGoalDataGenerator_.generate();
+        GoalData<Long> randomGoalData = randomGoalDataGenerator_.generate();
         prepareGoalManagerFactoryToCreateGoal(randomGoalData);
         patient_.registerListener(listenerList_[0]);
         patient_.registerListener(listenerList_[1]);
@@ -326,8 +324,8 @@ class TestGoalRegistry {
         verify(listenerList_[1], times(1)).goalAdded(goalId);
     }
 
-    private I_GoalManager<FakeTimestampedValue> prepareGoalManagerFactoryToCreateGoal(GoalData<FakeTimestampedValue> goalData) {
-        I_GoalManager<FakeTimestampedValue> mockGoalManager = mock(I_FakeValueGoalManager.class);
+    private I_GoalManager<Long> prepareGoalManagerFactoryToCreateGoal(GoalData<Long> goalData) {
+        I_GoalManager<Long> mockGoalManager = mock(I_FakeValueGoalManager.class);
         when(goalManagerFactory_.createGoalManager(goalData)).thenReturn(mockGoalManager);
 
         return mockGoalManager;
@@ -335,9 +333,9 @@ class TestGoalRegistry {
 
     private void injectRandomGoalsIntoPatient() {
         int numberGoalsToInject = new RandomInt().generate(1, 10);
-        ArrayList<GoalData<FakeTimestampedValue>> randomGoalDataList =
+        ArrayList<GoalData<Long>> randomGoalDataList =
                 new RandomArrayList<>(randomGoalDataGenerator_).generate(numberGoalsToInject);
-        for (GoalData<FakeTimestampedValue> goal : randomGoalDataList) {
+        for (GoalData<Long> goal : randomGoalDataList) {
             prepareGoalManagerFactoryToCreateGoal(goal);
             patient_.addGoal(goal);
         }

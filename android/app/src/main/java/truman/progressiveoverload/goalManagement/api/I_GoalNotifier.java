@@ -1,13 +1,11 @@
 package truman.progressiveoverload.goalManagement.api;
 
-import truman.progressiveoverload.measurement.I_TimestampedValue;
+public interface I_GoalNotifier<GoalFlavour> {
+    void registerListener(I_GoalListener<GoalFlavour> listener);
 
-public interface I_GoalNotifier<TimestampedType extends I_TimestampedValue> {
-    void registerListener(I_GoalListener<TimestampedType> listener);
+    void unregisterListener(I_GoalListener<GoalFlavour> listener);
 
-    void unregisterListener(I_GoalListener<TimestampedType> listener);
-
-    GoalData<TimestampedType> currentState();
+    GoalData<GoalFlavour> currentState();
 
 
 }

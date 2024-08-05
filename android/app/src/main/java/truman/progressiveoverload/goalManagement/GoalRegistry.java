@@ -9,26 +9,25 @@ import truman.progressiveoverload.goalManagement.api.I_GoalRegistryListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalNotifier;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
-import truman.progressiveoverload.measurement.I_TimestampedValue;
 
-class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_GoalRegistry<TimestampedType> {
-    private final I_GoalManagerFactory<TimestampedType> goalManagerFactory_;
+class GoalRegistry<GoalFlavour> implements I_GoalRegistry<GoalFlavour> {
+    private final I_GoalManagerFactory<GoalFlavour> goalManagerFactory_;
     private final UniqueIdSource idSource_;
-    private final HashMap<Long, I_GoalManager<TimestampedType>> goalManagersByGoalIds_;
+    private final HashMap<Long, I_GoalManager<GoalFlavour>> goalManagersByGoalIds_;
     private final HashSet<I_GoalRegistryListener> listeners_;
 
-    public GoalRegistry(HashMap<Long, GoalData<TimestampedType>> goalsByIdFromPersistence,
-                        I_GoalManagerFactory<TimestampedType> goalManagerFactory, UniqueIdSource uniqueIdSource) {
+    public GoalRegistry(HashMap<Long, GoalData<GoalFlavour>> goalsByIdFromPersistence,
+                        I_GoalManagerFactory<GoalFlavour> goalManagerFactory, UniqueIdSource uniqueIdSource) {
         goalManagerFactory_ = goalManagerFactory;
         idSource_ = uniqueIdSource;
         goalManagersByGoalIds_ = new HashMap<>();
-        for (Map.Entry<Long, GoalData<TimestampedType>> idAndGoalDataPair : goalsByIdFromPersistence.entrySet()) {
+        for (Map.Entry<Long, GoalData<GoalFlavour>> idAndGoalDataPair : goalsByIdFromPersistence.entrySet()) {
             Long id = idAndGoalDataPair.getKey();
-            GoalData<TimestampedType> goalData = idAndGoalDataPair.getValue();
+            GoalData<GoalFlavour> goalData = idAndGoalDataPair.getValue();
 
             boolean idIsAvailable = uniqueIdSource.attemptToReserveId(id);
             if (idIsAvailable) {
-                I_GoalManager<TimestampedType> goalManager = goalManagerFactory.createGoalManager(goalData);
+                I_GoalManager<GoalFlavour> goalManager = goalManagerFactory.createGoalManager(goalData);
                 goalManagersByGoalIds_.put(id, goalManager);
             }
         }
@@ -52,7 +51,7 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
     }
 
     @Override
-    public I_GoalNotifier<TimestampedType> goalUpdateNotifierByGoalId(Long goalId) throws InvalidQueryException {
+    public I_GoalNotifier<GoalFlavour> goalUpdateNotifierByGoalId(Long goalId) throws InvalidQueryException {
         if (!goalManagersByGoalIds_.containsKey(goalId)) {
             throw new InvalidQueryException("No goal update notifier with matching goal ID");
         }
@@ -61,7 +60,7 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
 
     // I_GoalRegistryUpdater
     @Override
-    public I_GoalUpdater<TimestampedType> goalUpdaterByGoalId(Long goalId) throws InvalidQueryException {
+    public I_GoalUpdater<GoalFlavour> goalUpdaterByGoalId(Long goalId) throws InvalidQueryException {
         if (!goalManagersByGoalIds_.containsKey(goalId)) {
             throw new InvalidQueryException("No goal updater with matching goal ID");
         }
@@ -69,7 +68,7 @@ class GoalRegistry<TimestampedType extends I_TimestampedValue> implements I_Goal
     }
 
     @Override
-    public Long addGoal(GoalData<TimestampedType> goalData) {
+    public Long addGoal(GoalData<GoalFlavour> goalData) {
         Long newGoalId = idSource_.nextAvailableId();
         goalManagersByGoalIds_.put(newGoalId, goalManagerFactory_.createGoalManager(goalData));
         for (I_GoalRegistryListener listener : listeners_) {

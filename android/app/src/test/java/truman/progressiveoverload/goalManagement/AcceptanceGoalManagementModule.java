@@ -22,26 +22,26 @@ import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdater;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
-import truman.progressiveoverload.measurement.fake.FakeTimestampedValue;
-import truman.progressiveoverload.measurement.fake.RandomFakeTimestampedValue;
+import truman.progressiveoverload.goalManagement.api.RandomTimestampedValue;
+import truman.progressiveoverload.goalManagement.api.TimestampedValue;
 import truman.progressiveoverload.randomUtilities.RandomHashMap;
 import truman.progressiveoverload.randomUtilities.RandomLong;
 
 class AcceptanceGoalManagementModule {
 
     // intermediate interfaces to appease the mockito gods
-    private interface I_FakeValueGoalDataPersistenceSource extends I_GoalDataPersistenceSource<FakeTimestampedValue> {
+    private interface I_FakeValueGoalDataPersistenceSource extends I_GoalDataPersistenceSource<Long> {
     }
 
-    private interface I_FakeValueGoalListener extends I_GoalListener<FakeTimestampedValue> {
+    private interface I_FakeValueGoalListener extends I_GoalListener<Long> {
     }
 
-    private final RandomGoalData<FakeTimestampedValue> goalDataGenerator_ = new RandomGoalData<>(new RandomFakeTimestampedValue());
+    private final RandomGoalData<Long> goalDataGenerator_ = new RandomGoalData<>(new RandomLong());
     private I_GoalRegistryListener[] goalRegistryListenerList_;
     private I_FakeValueGoalListener[] goalListenerList_;
     private I_FakeValueGoalDataPersistenceSource persistenceSource_;
     private UniqueIdSource idSource_;
-    private GoalManagementModule<FakeTimestampedValue> patient_;
+    private GoalManagementModule<Long> patient_;
 
     @BeforeEach
     public void resetEverything() {
@@ -65,20 +65,20 @@ class AcceptanceGoalManagementModule {
 
     @Test
     public void initializesModuleUsingPersistenceData() {
-        HashMap<Long, GoalData<FakeTimestampedValue>> persistenceData =
+        HashMap<Long, GoalData<Long>> persistenceData =
                 new RandomHashMap<>(new RandomLong(), goalDataGenerator_).generate();
         when(persistenceSource_.loadGoalDataFromMemory()).thenReturn(persistenceData);
         HashSet<Long> expectedGoalIdSet = new HashSet<>(persistenceData.keySet());
 
         resetPatient();
-        I_GoalRegistryNotifier<FakeTimestampedValue> goalRegistryNotifier = patient_.goalRegistryNotifier();
+        I_GoalRegistryNotifier<Long> goalRegistryNotifier = patient_.goalRegistryNotifier();
 
         assertEquals(expectedGoalIdSet, goalRegistryNotifier.currentGoalIds());
     }
 
     @Test
     public void willNotifyGoalRegistryListenersWhenSetOfGoalChanges() {
-        GoalData<FakeTimestampedValue> goalData = goalDataGenerator_.generate();
+        GoalData<Long> goalData = goalDataGenerator_.generate();
         patient_.goalRegistryNotifier().registerListener(goalRegistryListenerList_[0]);
         patient_.goalRegistryNotifier().registerListener(goalRegistryListenerList_[1]);
 
@@ -90,14 +90,14 @@ class AcceptanceGoalManagementModule {
 
     @Test
     public void willNotifyGoalListenersWhenGoalChanges() {
-        GoalData<FakeTimestampedValue> goalData = goalDataGenerator_.generate();
-        FakeTimestampedValue milestone = new RandomFakeTimestampedValue().generate();
-        I_GoalRegistryNotifier<FakeTimestampedValue> goalRegistryNotifier = patient_.goalRegistryNotifier();
-        I_GoalRegistryUpdater<FakeTimestampedValue> goalRegistryUpdater = patient_.goalRegistryUpdater();
+        GoalData<Long> goalData = goalDataGenerator_.generate();
+        TimestampedValue<Long> milestone = new RandomTimestampedValue<>(new RandomLong()).generate();
+        I_GoalRegistryNotifier<Long> goalRegistryNotifier = patient_.goalRegistryNotifier();
+        I_GoalRegistryUpdater<Long> goalRegistryUpdater = patient_.goalRegistryUpdater();
         Long goalId = patient_.goalRegistryUpdater().addGoal(goalData);
         try {
-            I_GoalNotifier<FakeTimestampedValue> goalNotifier = goalRegistryNotifier.goalUpdateNotifierByGoalId(goalId);
-            I_GoalUpdater<FakeTimestampedValue> goalUpdater = goalRegistryUpdater.goalUpdaterByGoalId(goalId);
+            I_GoalNotifier<Long> goalNotifier = goalRegistryNotifier.goalUpdateNotifierByGoalId(goalId);
+            I_GoalUpdater<Long> goalUpdater = goalRegistryUpdater.goalUpdaterByGoalId(goalId);
             goalNotifier.registerListener(goalListenerList_[0]);
             goalNotifier.registerListener(goalListenerList_[1]);
 

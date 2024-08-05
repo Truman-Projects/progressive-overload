@@ -1,20 +1,20 @@
 package truman.progressiveoverload.goalManagement.api;
 
+import java.time.Duration;
+
 import truman.progressiveoverload.goalManagement.GoalManagementModule;
-import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;
-import truman.progressiveoverload.measurement.distance.TimestampedDistance;
-import truman.progressiveoverload.measurement.duration.TimestampedDuration;
-import truman.progressiveoverload.measurement.mass.TimestampedMass;
-import truman.progressiveoverload.measurement.velocity.TimestampedVelocity;
+import truman.progressiveoverload.measurement.distance.Distance;
+import truman.progressiveoverload.measurement.mass.Mass;
+import truman.progressiveoverload.measurement.velocity.Velocity;
 
 public interface I_GoalManagementContainer {
-    GoalManagementModule<TimestampedMass> massModule();
+    GoalManagementModule<Mass> massModule();
 
-    GoalManagementModule<TimestampedDistance> distanceModule();
+    GoalManagementModule<Distance> distanceModule();
 
-    GoalManagementModule<TimestampedDuration> durationModule();
+    GoalManagementModule<Duration> durationModule();
 
-    GoalManagementModule<TimestampedVelocity> velocityModule();
+    GoalManagementModule<Velocity> velocityModule();
 
-    GoalManagementModule<TimestampedCustomValue> customUnitModule();
+    GoalManagementModule<Double> customUnitModule();
 }

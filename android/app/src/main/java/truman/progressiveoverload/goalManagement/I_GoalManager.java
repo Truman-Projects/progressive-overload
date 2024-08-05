@@ -6,19 +6,19 @@ import truman.progressiveoverload.goalManagement.api.I_GoalListener;
 import truman.progressiveoverload.goalManagement.api.I_GoalNotifier;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
-import truman.progressiveoverload.measurement.I_TimestampedValue;
+import truman.progressiveoverload.goalManagement.api.TimestampedValue;
 
-interface I_GoalManager<TimestampedType extends I_TimestampedValue> extends I_GoalNotifier<TimestampedType>,
-        I_GoalUpdater<TimestampedType> {
+interface I_GoalManager<GoalFlavour> extends I_GoalNotifier<GoalFlavour>,
+        I_GoalUpdater<GoalFlavour> {
     // I_GoalUpdateNotifier
     @Override
-    void registerListener(I_GoalListener<TimestampedType> listener);
+    void registerListener(I_GoalListener<GoalFlavour> listener);
 
     @Override
-    void unregisterListener(I_GoalListener<TimestampedType> listener);
+    void unregisterListener(I_GoalListener<GoalFlavour> listener);
 
     @Override
-    GoalData<TimestampedType> currentState();
+    GoalData<GoalFlavour> currentState();
 
     // I_GoalUpdater
     @Override
@@ -31,21 +31,21 @@ interface I_GoalManager<TimestampedType extends I_TimestampedValue> extends I_Go
     void changeGoalType(GoalType newGoalType);
 
     @Override
-    Long addRecord(TimestampedType record);
+    Long addRecord(TimestampedValue<GoalFlavour> record);
 
     @Override
     void removeRecord(Long recordId) throws InvalidQueryException;
 
     @Override
-    void editRecord(Long recordId, TimestampedType updatedRecord) throws InvalidQueryException;
+    void editRecord(Long recordId, TimestampedValue<GoalFlavour> updatedRecord) throws InvalidQueryException;
 
     @Override
-    Long addTargetMilestone(TimestampedType targetMilestone);
+    Long addTargetMilestone(TimestampedValue<GoalFlavour> targetMilestone);
 
     @Override
     void removeTargetMilestone(Long milestoneId) throws InvalidQueryException;
 
     @Override
-    void editTargetMilestone(Long milestoneId, TimestampedType updatedMilestone) throws InvalidQueryException;
+    void editTargetMilestone(Long milestoneId, TimestampedValue<GoalFlavour> updatedMilestone) throws InvalidQueryException;
 
 }

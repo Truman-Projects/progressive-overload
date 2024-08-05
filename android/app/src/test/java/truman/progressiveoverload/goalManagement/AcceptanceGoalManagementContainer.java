@@ -6,40 +6,39 @@ import static org.mockito.Mockito.mock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import truman.progressiveoverload.goalManagement.api.I_GoalDataPersistenceSource;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
-import truman.progressiveoverload.measurement.custom.RandomTimestampedCustomValue;
-import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;
-import truman.progressiveoverload.measurement.distance.RandomTimestampedDistance;
-import truman.progressiveoverload.measurement.distance.TimestampedDistance;
-import truman.progressiveoverload.measurement.duration.RandomTimestampedDuration;
-import truman.progressiveoverload.measurement.duration.TimestampedDuration;
-import truman.progressiveoverload.measurement.mass.RandomTimestampedMass;
-import truman.progressiveoverload.measurement.mass.TimestampedMass;
-import truman.progressiveoverload.measurement.velocity.RandomTimestampedVelocity;
-import truman.progressiveoverload.measurement.velocity.TimestampedVelocity;
+import truman.progressiveoverload.measurement.distance.RandomDistance;
+import truman.progressiveoverload.measurement.distance.Distance;
+import truman.progressiveoverload.measurement.mass.RandomMass;
+import truman.progressiveoverload.measurement.mass.Mass;
+import truman.progressiveoverload.measurement.velocity.RandomVelocity;
+import truman.progressiveoverload.measurement.velocity.Velocity;
+import truman.progressiveoverload.randomUtilities.RandomDouble;
+import truman.progressiveoverload.randomUtilities.RandomDuration;
 import truman.progressiveoverload.randomUtilities.RandomInt;
 
 class AcceptanceGoalManagementContainer {
 
     // intermediate interfaces for Mockito
-    private interface I_FakeMassGoalPersistenceSource extends I_GoalDataPersistenceSource<TimestampedMass> {
+    private interface I_FakeMassGoalPersistenceSource extends I_GoalDataPersistenceSource<Mass> {
     }
 
-    private interface I_FakeDistanceGoalPersistenceSource extends I_GoalDataPersistenceSource<TimestampedDistance> {
+    private interface I_FakeDistanceGoalPersistenceSource extends I_GoalDataPersistenceSource<Distance> {
     }
 
-    private interface I_FakeDurationGoalPersistenceSource extends I_GoalDataPersistenceSource<TimestampedDuration> {
+    private interface I_FakeDurationGoalPersistenceSource extends I_GoalDataPersistenceSource<Duration> {
     }
 
-    private interface I_FakeVelocityGoalPersistenceSource extends I_GoalDataPersistenceSource<TimestampedVelocity> {
+    private interface I_FakeVelocityGoalPersistenceSource extends I_GoalDataPersistenceSource<Velocity> {
     }
 
-    private interface I_FakeCustomGoalPersistenceSource extends I_GoalDataPersistenceSource<TimestampedCustomValue> {
+    private interface I_FakeCustomGoalPersistenceSource extends I_GoalDataPersistenceSource<Double> {
     }
 
     private I_FakeMassGoalPersistenceSource mockMassPersistenceSource_;
@@ -66,27 +65,27 @@ class AcceptanceGoalManagementContainer {
         int numberOfGoalsToGeneratePerModule = new RandomInt().generate(5, 10);
         ArrayList<Long> allGoalIds = new ArrayList<>();
         for (int i = 0; i < numberOfGoalsToGeneratePerModule; i++) {
-            RandomGoalData<TimestampedMass> massGoalGenerator = new RandomGoalData<>(new RandomTimestampedMass());
+            RandomGoalData<Mass> massGoalGenerator = new RandomGoalData<>(new RandomMass());
             Long id = patient_.massModule().goalRegistryUpdater().addGoal(massGoalGenerator.generate());
             allGoalIds.add(id);
         }
         for (int i = 0; i < numberOfGoalsToGeneratePerModule; i++) {
-            RandomGoalData<TimestampedDistance> distanceGoalGenerator = new RandomGoalData<>(new RandomTimestampedDistance());
+            RandomGoalData<Distance> distanceGoalGenerator = new RandomGoalData<>(new RandomDistance());
             Long id = patient_.distanceModule().goalRegistryUpdater().addGoal(distanceGoalGenerator.generate());
             allGoalIds.add(id);
         }
         for (int i = 0; i < numberOfGoalsToGeneratePerModule; i++) {
-            RandomGoalData<TimestampedDuration> durationGoalGenerator = new RandomGoalData<>(new RandomTimestampedDuration());
+            RandomGoalData<Duration> durationGoalGenerator = new RandomGoalData<>(new RandomDuration());
             Long id = patient_.durationModule().goalRegistryUpdater().addGoal(durationGoalGenerator.generate());
             allGoalIds.add(id);
         }
         for (int i = 0; i < numberOfGoalsToGeneratePerModule; i++) {
-            RandomGoalData<TimestampedVelocity> velocityGoalGenerator = new RandomGoalData<>(new RandomTimestampedVelocity());
+            RandomGoalData<Velocity> velocityGoalGenerator = new RandomGoalData<>(new RandomVelocity());
             Long id = patient_.velocityModule().goalRegistryUpdater().addGoal(velocityGoalGenerator.generate());
             allGoalIds.add(id);
         }
         for (int i = 0; i < numberOfGoalsToGeneratePerModule; i++) {
-            RandomGoalData<TimestampedCustomValue> customUnitGoalGenerator = new RandomGoalData<>(new RandomTimestampedCustomValue());
+            RandomGoalData<Double> customUnitGoalGenerator = new RandomGoalData<>(new RandomDouble());
             Long id = patient_.customUnitModule().goalRegistryUpdater().addGoal(customUnitGoalGenerator.generate());
             allGoalIds.add(id);
         }

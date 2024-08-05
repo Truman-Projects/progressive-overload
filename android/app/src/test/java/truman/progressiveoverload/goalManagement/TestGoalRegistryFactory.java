@@ -12,24 +12,22 @@ import java.util.HashMap;
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.I_GoalDataPersistenceSource;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
-import truman.progressiveoverload.measurement.fake.FakeTimestampedValue;
-import truman.progressiveoverload.measurement.fake.RandomFakeTimestampedValue;
 import truman.progressiveoverload.randomUtilities.RandomHashMap;
 import truman.progressiveoverload.randomUtilities.RandomLong;
 
 class TestGoalRegistryFactory {
     // intermediate interface to appease the mockito gods
 
-    private interface I_FakeValuePersistenceSource extends I_GoalDataPersistenceSource<FakeTimestampedValue> {
+    private interface I_FakeValuePersistenceSource extends I_GoalDataPersistenceSource<Long> {
     }
 
-    private interface I_FakeValueGoalManagerFactory extends I_GoalManagerFactory<FakeTimestampedValue> {
+    private interface I_FakeValueGoalManagerFactory extends I_GoalManagerFactory<Long> {
     }
 
     private I_FakeValuePersistenceSource persistenceSource_;
     private I_FakeValueGoalManagerFactory goalManagerFactory_;
     private UniqueIdSource idSource_;
-    private GoalRegistryFactory<FakeTimestampedValue> patient_;
+    private GoalRegistryFactory<Long> patient_;
 
     @BeforeEach
     public void resetEverything() {
@@ -41,18 +39,18 @@ class TestGoalRegistryFactory {
 
     @Test
     public void willCreateCorrectTypeOfGoalRegistry() {
-        I_GoalRegistry<FakeTimestampedValue> goalRegistry = patient_.createGoalRegistry();
+        I_GoalRegistry<Long> goalRegistry = patient_.createGoalRegistry();
 
         assertTrue(goalRegistry instanceof GoalRegistry);
     }
 
     @Test
     public void willConstructGoalRegistryWithPersistenceData() {
-        HashMap<Long, GoalData<FakeTimestampedValue>> persistenceData = new RandomHashMap<>(new RandomLong(),
-                new RandomGoalData<>(new RandomFakeTimestampedValue())).generate();
+        HashMap<Long, GoalData<Long>> persistenceData = new RandomHashMap<>(new RandomLong(),
+                new RandomGoalData<>(new RandomLong())).generate();
         when(persistenceSource_.loadGoalDataFromMemory()).thenReturn(persistenceData);
 
-        I_GoalRegistry<FakeTimestampedValue> goalRegistry = patient_.createGoalRegistry();
+        I_GoalRegistry<Long> goalRegistry = patient_.createGoalRegistry();
 
         assertEquals(persistenceData.keySet(), goalRegistry.currentGoalIds());
     }

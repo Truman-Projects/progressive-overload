@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.time.Duration;
 import java.util.stream.Stream;
 
 import truman.progressiveoverload.goalManagement.api.GoalData;
@@ -21,30 +22,27 @@ import truman.progressiveoverload.goalManagement.api.GoalType;
 import truman.progressiveoverload.goalManagement.api.I_GoalRegistryUpdater;
 import truman.progressiveoverload.goalFlavours.useCase.api.GoalFlavour;
 import truman.progressiveoverload.goalWriting.useCase.api.GoalPolarity;
-import truman.progressiveoverload.measurement.I_TimestampedValue;
-import truman.progressiveoverload.measurement.custom.TimestampedCustomValue;
-import truman.progressiveoverload.measurement.distance.TimestampedDistance;
-import truman.progressiveoverload.measurement.duration.TimestampedDuration;
-import truman.progressiveoverload.measurement.mass.TimestampedMass;
-import truman.progressiveoverload.measurement.velocity.TimestampedVelocity;
+import truman.progressiveoverload.measurement.distance.Distance;
+import truman.progressiveoverload.measurement.mass.Mass;
+import truman.progressiveoverload.measurement.velocity.Velocity;
 import truman.progressiveoverload.randomUtilities.RandomEnum;
 import truman.progressiveoverload.randomUtilities.RandomLong;
 import truman.progressiveoverload.randomUtilities.RandomString;
 
 public class TestGoalWriter {
-    private interface I_MockMassGoalRegistryUpdater extends I_GoalRegistryUpdater<TimestampedMass> {
+    private interface I_MockMassGoalRegistryUpdater extends I_GoalRegistryUpdater<Mass> {
     }
 
-    private interface I_MockDistanceGoalRegistryUpdater extends I_GoalRegistryUpdater<TimestampedDistance> {
+    private interface I_MockDistanceGoalRegistryUpdater extends I_GoalRegistryUpdater<Distance> {
     }
 
-    private interface I_MockDurationGoalRegistryUpdater extends I_GoalRegistryUpdater<TimestampedDuration> {
+    private interface I_MockDurationGoalRegistryUpdater extends I_GoalRegistryUpdater<Duration> {
     }
 
-    private interface I_MockVelocityGoalRegistryUpdater extends I_GoalRegistryUpdater<TimestampedVelocity> {
+    private interface I_MockVelocityGoalRegistryUpdater extends I_GoalRegistryUpdater<Velocity> {
     }
 
-    private interface I_MockCustomGoalRegistryUpdater extends I_GoalRegistryUpdater<TimestampedCustomValue> {
+    private interface I_MockCustomGoalRegistryUpdater extends I_GoalRegistryUpdater<Double> {
     }
 
     private I_MockMassGoalRegistryUpdater mockMassGoalRegistryUpdater_;
@@ -69,8 +67,8 @@ public class TestGoalWriter {
                 mockVelocityGoalRegistryUpdater_, mockCustomGoalRegistryUpdater_);
     }
 
-    private <T extends I_TimestampedValue> void testGoalCreation(GoalPolarity goalPolarity, GoalType expectedGoalType,
-                                                                 I_GoalRegistryUpdater<T> goalRegistryUpdater, GoalFlavour goalFlavour) {
+    private <T> void testGoalCreation(GoalPolarity goalPolarity, GoalType expectedGoalType,
+                                      I_GoalRegistryUpdater<T> goalRegistryUpdater, GoalFlavour goalFlavour) {
         RandomString stringGen = new RandomString();
         String randomName = stringGen.generate();
         String randomDescription = stringGen.generate();
