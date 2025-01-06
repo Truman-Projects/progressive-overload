@@ -1,0 +1,3 @@
+[submodule "android/app/external/JavaRandoms"]
+	path = android/app/external/JavaRandoms
+	url = git@github.com:TrumanYen/JavaRandoms.git
