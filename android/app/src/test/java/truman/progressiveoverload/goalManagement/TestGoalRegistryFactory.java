@@ -12,8 +12,8 @@ import java.util.HashMap;
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.I_GoalDataPersistenceSource;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
-import truman.progressiveoverload.randomUtilities.RandomHashMap;
-import truman.progressiveoverload.randomUtilities.RandomLong;
+import javarandoms.RandomHashMap;
+import javarandoms.RandomLong;
 
 class TestGoalRegistryFactory {
     // intermediate interface to appease the mockito gods

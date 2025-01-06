@@ -17,8 +17,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import truman.progressiveoverload.randomUtilities.RandomLong;
-import truman.progressiveoverload.randomUtilities.RandomOther;
+import javarandoms.RandomLong;
+import javarandoms.RandomOther;
 
 class TestUniqueIdSource {
 

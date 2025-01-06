@@ -24,8 +24,8 @@ import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
 import truman.progressiveoverload.goalManagement.api.RandomTimestampedValue;
 import truman.progressiveoverload.goalManagement.api.TimestampedValue;
-import truman.progressiveoverload.randomUtilities.RandomHashMap;
-import truman.progressiveoverload.randomUtilities.RandomLong;
+import javarandoms.RandomHashMap;
+import javarandoms.RandomLong;
 
 class AcceptanceGoalManagementModule {
 

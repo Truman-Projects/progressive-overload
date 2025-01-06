@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
-import truman.progressiveoverload.randomUtilities.RandomEnum;
-import truman.progressiveoverload.randomUtilities.RandomHashMap;
-import truman.progressiveoverload.randomUtilities.RandomLong;
-import truman.progressiveoverload.randomUtilities.RandomOther;
-import truman.progressiveoverload.randomUtilities.RandomString;
+import javarandoms.RandomEnum;
+import javarandoms.RandomHashMap;
+import javarandoms.RandomLong;
+import javarandoms.RandomOther;
+import javarandoms.RandomString;
 
 class TestGoalData {
     private static final RandomLong longGenerator = new RandomLong();

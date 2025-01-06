@@ -1,7 +1,7 @@
 package truman.progressiveoverload.measurement.mass;
 
-import truman.progressiveoverload.randomUtilities.I_RandomValueGenerator;
-import truman.progressiveoverload.randomUtilities.RandomLong;
+import javarandoms.I_RandomValueGenerator;
+import javarandoms.RandomLong;
 
 public class RandomMass implements I_RandomValueGenerator<Mass> {
     public Mass generate() {

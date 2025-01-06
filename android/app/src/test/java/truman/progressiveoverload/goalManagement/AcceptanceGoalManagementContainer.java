@@ -19,9 +19,9 @@ import truman.progressiveoverload.measurement.mass.RandomMass;
 import truman.progressiveoverload.measurement.mass.Mass;
 import truman.progressiveoverload.measurement.velocity.RandomVelocity;
 import truman.progressiveoverload.measurement.velocity.Velocity;
-import truman.progressiveoverload.randomUtilities.RandomDouble;
-import truman.progressiveoverload.randomUtilities.RandomDuration;
-import truman.progressiveoverload.randomUtilities.RandomInt;
+import javarandoms.RandomDouble;
+import javarandoms.RandomDuration;
+import javarandoms.RandomInt;
 
 class AcceptanceGoalManagementContainer {
 

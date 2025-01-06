@@ -2,11 +2,11 @@ package truman.progressiveoverload.goalManagement.api;
 
 import java.util.HashMap;
 
-import truman.progressiveoverload.randomUtilities.I_RandomValueGenerator;
-import truman.progressiveoverload.randomUtilities.RandomEnum;
-import truman.progressiveoverload.randomUtilities.RandomHashMap;
-import truman.progressiveoverload.randomUtilities.RandomLong;
-import truman.progressiveoverload.randomUtilities.RandomString;
+import javarandoms.I_RandomValueGenerator;
+import javarandoms.RandomEnum;
+import javarandoms.RandomHashMap;
+import javarandoms.RandomLong;
+import javarandoms.RandomString;
 
 public class RandomGoalData<GoalFlavour> implements I_RandomValueGenerator<GoalData<GoalFlavour>> {
     private final RandomHashMap<Long, TimestampedValue<GoalFlavour>> timestampedValueHashMapGenerator_;

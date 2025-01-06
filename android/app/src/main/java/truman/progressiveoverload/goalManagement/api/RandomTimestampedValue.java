@@ -1,7 +1,7 @@
 package truman.progressiveoverload.goalManagement.api;
 
-import truman.progressiveoverload.randomUtilities.I_RandomValueGenerator;
-import truman.progressiveoverload.randomUtilities.RandomLong;
+import javarandoms.I_RandomValueGenerator;
+import javarandoms.RandomLong;
 
 public class RandomTimestampedValue<T> implements I_RandomValueGenerator<TimestampedValue<T>> {
     private final RandomLong timestampGenerator_;

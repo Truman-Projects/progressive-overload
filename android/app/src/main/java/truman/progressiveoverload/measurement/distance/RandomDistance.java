@@ -1,7 +1,7 @@
 package truman.progressiveoverload.measurement.distance;
 
-import truman.progressiveoverload.randomUtilities.I_RandomValueGenerator;
-import truman.progressiveoverload.randomUtilities.RandomLong;
+import javarandoms.I_RandomValueGenerator;
+import javarandoms.RandomLong;
 
 public class RandomDistance implements I_RandomValueGenerator<Distance> {
     public Distance generate() {

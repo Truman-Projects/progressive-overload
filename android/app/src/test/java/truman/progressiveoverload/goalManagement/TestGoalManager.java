@@ -25,11 +25,11 @@ import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
 import truman.progressiveoverload.goalManagement.api.RandomTimestampedValue;
 import truman.progressiveoverload.goalManagement.api.TimestampedValue;
-import truman.progressiveoverload.randomUtilities.RandomHashMap;
-import truman.progressiveoverload.randomUtilities.RandomInt;
-import truman.progressiveoverload.randomUtilities.RandomLong;
-import truman.progressiveoverload.randomUtilities.RandomOther;
-import truman.progressiveoverload.randomUtilities.RandomString;
+import javarandoms.RandomHashMap;
+import javarandoms.RandomInt;
+import javarandoms.RandomLong;
+import javarandoms.RandomOther;
+import javarandoms.RandomString;
 
 class TestGoalManager {
 

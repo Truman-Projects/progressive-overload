@@ -13,8 +13,8 @@ import java.util.stream.Stream;
 
 import truman.progressiveoverload.measurement.distance.Distance;
 import truman.progressiveoverload.measurement.distance.RandomDistance;
-import truman.progressiveoverload.randomUtilities.RandomLong;
-import truman.progressiveoverload.randomUtilities.RandomOther;
+import javarandoms.RandomLong;
+import javarandoms.RandomOther;
 
 class TestVelocity {
     private long patientInCentimetersPerHour_;

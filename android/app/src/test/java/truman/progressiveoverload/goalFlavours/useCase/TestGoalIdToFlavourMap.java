@@ -23,8 +23,8 @@ import truman.progressiveoverload.goalFlavours.useCase.api.GoalFlavour;
 import truman.progressiveoverload.measurement.distance.Distance;
 import truman.progressiveoverload.measurement.mass.Mass;
 import truman.progressiveoverload.measurement.velocity.Velocity;
-import truman.progressiveoverload.randomUtilities.RandomHashSet;
-import truman.progressiveoverload.randomUtilities.RandomLong;
+import javarandoms.RandomHashSet;
+import javarandoms.RandomLong;
 
 class TestGoalIdToFlavourMap {
 

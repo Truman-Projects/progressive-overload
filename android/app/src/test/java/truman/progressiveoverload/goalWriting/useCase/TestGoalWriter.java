@@ -25,9 +25,9 @@ import truman.progressiveoverload.goalWriting.useCase.api.GoalPolarity;
 import truman.progressiveoverload.measurement.distance.Distance;
 import truman.progressiveoverload.measurement.mass.Mass;
 import truman.progressiveoverload.measurement.velocity.Velocity;
-import truman.progressiveoverload.randomUtilities.RandomEnum;
-import truman.progressiveoverload.randomUtilities.RandomLong;
-import truman.progressiveoverload.randomUtilities.RandomString;
+import javarandoms.RandomEnum;
+import javarandoms.RandomLong;
+import javarandoms.RandomString;
 
 public class TestGoalWriter {
     private interface I_MockMassGoalRegistryUpdater extends I_GoalRegistryUpdater<Mass> {

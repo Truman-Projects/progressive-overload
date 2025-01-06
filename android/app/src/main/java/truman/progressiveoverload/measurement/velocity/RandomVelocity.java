@@ -2,7 +2,7 @@ package truman.progressiveoverload.measurement.velocity;
 
 import truman.progressiveoverload.measurement.distance.Distance;
 import truman.progressiveoverload.measurement.distance.RandomDistance;
-import truman.progressiveoverload.randomUtilities.I_RandomValueGenerator;
+import javarandoms.I_RandomValueGenerator;
 
 public class RandomVelocity implements I_RandomValueGenerator<Velocity> {
     public Velocity generate() {

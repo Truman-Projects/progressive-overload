@@ -19,11 +19,11 @@ import truman.progressiveoverload.goalManagement.api.I_GoalNotifier;
 import truman.progressiveoverload.goalManagement.api.I_GoalUpdater;
 import truman.progressiveoverload.goalManagement.api.InvalidQueryException;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
-import truman.progressiveoverload.randomUtilities.RandomArrayList;
-import truman.progressiveoverload.randomUtilities.RandomHashMap;
-import truman.progressiveoverload.randomUtilities.RandomInt;
-import truman.progressiveoverload.randomUtilities.RandomLong;
-import truman.progressiveoverload.randomUtilities.RandomOther;
+import javarandoms.RandomArrayList;
+import javarandoms.RandomHashMap;
+import javarandoms.RandomInt;
+import javarandoms.RandomLong;
+import javarandoms.RandomOther;
 
 class TestGoalRegistry {
     // intermediate interfaces to appease the mockito gods

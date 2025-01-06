@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import truman.progressiveoverload.goalManagement.api.GoalData;
 import truman.progressiveoverload.goalManagement.api.RandomGoalData;
-import truman.progressiveoverload.randomUtilities.RandomLong;
-
+import javarandoms.RandomLong;
 class TestGoalManagerFactory {
     private final RandomGoalData<Long> goalDataGenerator_ = new RandomGoalData<>(new RandomLong());
 

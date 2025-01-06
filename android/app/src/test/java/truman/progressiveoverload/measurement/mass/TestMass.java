@@ -11,8 +11,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 import truman.progressiveoverload.measurement.MagnitudeOutOfRangeException;
-import truman.progressiveoverload.randomUtilities.RandomDouble;
-import truman.progressiveoverload.randomUtilities.RandomLong;
+import javarandoms.RandomDouble;
+import javarandoms.RandomLong;
 
 public class TestMass {
 
